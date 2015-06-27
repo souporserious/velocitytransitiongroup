@@ -1,0 +1,40 @@
+{
+  "name": "velocitytransitiongroup",
+  "version": "0.0.1",
+  "description": "React addon component to easily use Velocity animations in React.",
+  "main": "scripts/index.jsx",
+  "scripts": {
+    "start": "npm run serve | npm run dev",
+    "serve": "http-server -p 8080",
+    "dev": "webpack-dev-server --devtool eval --hot --progress --colors --content-base example",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/souporserious/velocitytransitiongroup"
+  },
+  "keywords": [
+    "react",
+    "velocity",
+    "animation",
+    "transitions",
+    "ui"
+  ],
+  "author": "Travis Arnold <travis@souporserious.com> (http://souporserious.com)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/souporserious/velocitytransitiongroup/issues"
+  },
+  "homepage": "https://github.com/souporserious/velocitytransitiongroup",
+  "dependencies": {
+    "react": "^0.13.3",
+    "velocity-animate": "^1.2.2"
+  },
+  "devDependencies": {
+    "http-server": "^0.8.0",
+    "jsx-loader": "^0.13.2",
+    "node-libs-browser": "^0.5.2",
+    "webpack": "^1.9.12",
+    "webpack-dev-server": "^1.9.0"
+  }
+}
