@@ -4,8 +4,7 @@
   "description": "React addon component to easily use Velocity animations in React.",
   "main": "scripts/index.jsx",
   "scripts": {
-    "start": "npm run serve | npm run dev",
-    "serve": "http-server -p 8080",
+    "start": "npm run dev",
     "dev": "webpack-dev-server --devtool eval --hot --progress --colors --content-base example",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

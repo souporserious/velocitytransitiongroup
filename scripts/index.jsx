@@ -6,7 +6,7 @@ var VelocityTransitionGroup = require('./VelocityTransitionGroup');
 class App extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { items: ['apples', 'oranges', 'bananas'] };
+        this.state = { items: ['apples', 'oranges', 'bananas', 'pears', 'kiwis'] };
     }
 
     addItem() {
@@ -23,8 +23,11 @@ class App extends React.Component {
     render() {
 
         let items = this.state.items.map((item, index) => {
+            var styles = {
+                background: 'red'
+            };
             return(
-                <li key={item + index} onClick={this.removeItem.bind(this, index)}>
+                <li style={styles} key={index + '-' + item} onClick={this.removeItem.bind(this, index)}>
                     <div>{item}</div>
                 </li>
             );
@@ -36,9 +39,10 @@ class App extends React.Component {
                 <button onClick={this.addItem.bind(this)}>Add Item</button>
                 <VelocityTransitionGroup
                     component="ul"
-                    transitionEnter="fadeIn"
-                    transitionLeave="fadeOut"
+                    enter="transition.slideUpIn"
+                    leave="transition.slideDownOut"
                     transitionHeight={true}
+                    duration={350}
                 >
                     {items}
                 </VelocityTransitionGroup>
@@ -46,5 +50,38 @@ class App extends React.Component {
         );
     }
 }
+
+/*
+<VelocityTransitionGroup
+    component="ul"
+    
+    // transition upon entering DOM
+    enter="fadeIn"
+    
+    // if not set, no transition out should happen on leave
+    leave="transition.fadeOut"
+    
+    // either pass true or another string for a seperate transition on load
+    appear="transition.fadeIn"
+    
+    // pass true to use immediate parent or specify element to look for to
+    // transition height and make room to animate element in
+    transitionHeight={false}
+
+    // set a default duration for all transitions
+    duration={300}
+
+    // optionally pass in any options to velocity
+    // will override transitionEnter, transitionLeave, etc..
+    enterOptions={{
+        delay: 100,
+        etc...
+    }}
+    leaveOptions=""
+    appearOptions=""
+>
+    {items}
+</VelocityTransitionGroup>
+*/
 
 React.render(<App />, document.body);
