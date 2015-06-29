@@ -41,8 +41,6 @@ class App extends React.Component {
                     component="ul"
                     enter="transition.slideUpIn"
                     leave="transition.slideDownOut"
-                    transitionHeight={true}
-                    transitionChild="*"
                     duration={350}
                 >
                     {items}
@@ -51,38 +49,5 @@ class App extends React.Component {
         );
     }
 }
-
-/*
-<VelocityTransitionGroup
-    component="ul"
-    
-    // transition upon entering DOM
-    enter="fadeIn"
-    
-    // if not set, no transition out should happen on leave
-    leave="transition.fadeOut"
-    
-    // either pass true or another string for a seperate transition on load
-    appear="transition.fadeIn"
-    
-    // pass true to use immediate parent or specify element to look for to
-    // transition height and make room to animate element in
-    transitionHeight={false}
-
-    // set a default duration for all transitions
-    duration={300}
-
-    // optionally pass in any options to velocity
-    // will override transitionEnter, transitionLeave, etc..
-    enterOptions={{
-        delay: 100,
-        etc...
-    }}
-    leaveOptions=""
-    appearOptions=""
->
-    {items}
-</VelocityTransitionGroup>
-*/
 
 React.render(<App />, document.body);
