@@ -1,5 +1,14 @@
 ##VelocityTransitionGroup 0.1.1
 
+**Docs Coming Soon**
+
+###Run Example
+    npm run dev
+
+open your browser and visit: http://localhost:8080/
+
+###Example Usage
+
     <VelocityTransitionGroup
         component="ul"
         
