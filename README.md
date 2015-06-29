@@ -3,6 +3,7 @@
 **Docs Coming Soon**
 
 ###Run Example
+    npm install
     npm run dev
 
 open your browser and visit: http://localhost:8080/
