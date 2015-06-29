@@ -42,6 +42,7 @@ class App extends React.Component {
                     enter="transition.slideUpIn"
                     leave="transition.slideDownOut"
                     transitionHeight={true}
+                    transitionChild="*"
                     duration={350}
                 >
                     {items}

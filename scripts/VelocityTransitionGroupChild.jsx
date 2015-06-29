@@ -12,13 +12,13 @@ class VelocityTransitionGroupChild extends React.Component {
         super(props);
         this.defaults = {
             display: 'auto',
-            duration: this.props.duration || 1800
+            duration: this.props.duration || 350
         };
     }
 
-    _animateParent(parent, height, done, reverse) {
+    _animateParent(parent, height, done, reverse = false) {
 
-        let display = reverse ? 'none' : 'auto';
+        let display = reverse ? null : 'block';
 
         height = reverse ? 0 : [height, 0];
         
@@ -27,7 +27,7 @@ class VelocityTransitionGroupChild extends React.Component {
             parent.style.display = 'none';
             parent.style.overflow = 'hidden';
         }
-        
+
         Velocity(parent, {
                 height: height
             }, {
@@ -38,6 +38,10 @@ class VelocityTransitionGroupChild extends React.Component {
     }
 
     _animateChild(node, props, options, done, reverse = false) {
+        
+        let parent = this.props.transitionChild ? node : node.parentNode;
+        let child = this.props.transitionChild ? node.querySelector(this.props.transitionChild) : node;
+        
         // allow user to still be able to pass a complete callback
         // need to call component callback no matter what
         let complete = (options.complete) ? function () {
@@ -52,23 +56,23 @@ class VelocityTransitionGroupChild extends React.Component {
 
         if(this.props.transitionHeight) {
             
-            let height = node.offsetHeight,
-                child = node.querySelector('*');
-
-            child.style.display = 'none';
+            let height = node.offsetHeight;
+            
+            // hide child until we show it
+            child.style.opacity = 0;
 
             // pass everything to Velocity to handle animations
             if(reverse) {
                 // flip complete functions since it's in reverse
                 options = _.extend(options, {
                     complete: () => {
-                        this._animateParent(node, height, complete, true);
+                        this._animateParent(parent, height, complete, true);
                     }
                 });
                 Velocity(child, props, options);
             }
             else {
-                this._animateParent(node, height, function () {
+                this._animateParent(parent, height, function () {
                     Velocity(child, props, options);
                 });
             }
@@ -89,7 +93,7 @@ class VelocityTransitionGroupChild extends React.Component {
 
             // default to enter options if none provided for appear or false was not passed
             let options = (this.props.appear !== false) ?
-                                 this.props.appearOptions || {} : this.enterOptions;
+                           this.props.appearOptions || {} : this.enterOptions;
 
             this._animateChild(node, props, options, done);
         }
@@ -108,7 +112,7 @@ class VelocityTransitionGroupChild extends React.Component {
 
         let node = React.findDOMNode(this);
         let options = this.props.leaveOptions || {};
-
+        
         this._animateChild(node, this.props.leave, options, done, true);
     }
  

@@ -22,6 +22,7 @@ class VelocityTransitionGroup extends React.Component {
                 appearOptions={this.props.appearOptions}
                 duration={this.props.duration}
                 transitionHeight={this.props.transitionHeight}
+                transitionChild={this.props.transitionChild}
             >
                 {child}
             </VelocityTransitionGroupChild>
