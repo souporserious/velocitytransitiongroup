@@ -1,0 +1,25 @@
+{
+  "name": "velocitytransitiongroup",
+  "version": "0.1.3",
+  "homepage": "https://github.com/souporserious/velocitytransitiongroup",
+  "authors": [
+    "Travis Arnold <ftntravis@gmail.com>"
+  ],
+  "description": "React addon component to easily use Velocity animations in React.",
+  "main": "scripts/index.jsx",
+  "keywords": [
+    "react",
+    "velocity",
+    "animation",
+    "transition",
+    "ui"
+  ],
+  "license": "ISC",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
