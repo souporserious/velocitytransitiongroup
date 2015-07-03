@@ -21,12 +21,18 @@ var ReactTransitionChildMapping = {
    * @return {object} Mapping of key to child
    */
   getChildMapping: function(children) {
+    
     if(!children) {
       return children;
     }
-    return children.map(child => {
-      return child;
+
+    let mappedChildren = {};
+    
+    children.forEach(child => {
+      mappedChildren[child.key] = child;
     });
+
+    return mappedChildren;
   },
 
   /**

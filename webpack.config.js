@@ -1,6 +1,5 @@
 var path = require('path');
-var node_modules = path.resolve(__dirname, 'node_modules');
-var pathToReact = path.resolve(node_modules, 'react/dist/react-with-addons.min.js');
+var nodeModulesDir = path.resolve(__dirname, 'node_modules');
 
 module.exports = {
     entry: {
@@ -12,14 +11,10 @@ module.exports = {
     },
     module: {
         loaders: [
-            { test: /\.(js|jsx)/, loader: 'babel' },
-        ],
-        //noParse: [pathToReact]
+            { test: /\.(jsx)/, exclude: /node_modules/, loader: 'babel' },
+        ]
     },
     resolve: {
-        // alias: {
-        //   'react/addons': pathToReact
-        // },
         extensions: ['', '.js', '.jsx']
     },
     devServer: {

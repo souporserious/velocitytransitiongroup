@@ -2,8 +2,17 @@
 
 import React from 'react/addons';
 import TransitionChildMapping from './TransitionChildMapping';
+import VelocityTransitionGroupChild from './VelocityTransitionGroupChild';
 
-let VelocityTransitionGroup = React.createClass({
+// TODOS:
+//
+// maybe have a prop to check whether groups will be rendering,
+// this way we can let Velocity handle more performant animations
+// as well as allow them to have things like a stagger animation
+// 
+// we also need to hook up transitionHeight better
+
+let ReactTransitionGroup = React.createClass({
     
     propTypes: {
         component: React.PropTypes.any,
@@ -42,8 +51,11 @@ let VelocityTransitionGroup = React.createClass({
 
     componentWillReceiveProps: function (nextProps) {
 
+        let nextChildMapping = this._getCurrentChildMapping(nextProps.children);
         let prevChildMapping = this.state.children;
-        let nextChildMapping = this._getCurrentChildMapping();
+
+        console.log(prevChildMapping);
+        console.log(nextChildMapping);
 
         this.setState({
             children: TransitionChildMapping.mergeChildMappings(
@@ -57,7 +69,7 @@ let VelocityTransitionGroup = React.createClass({
             let hasPrev = prevChildMapping && prevChildMapping.hasOwnProperty(key);
 
             if(nextChildMapping[key] && !hasPrev &&
-                !this.currentlyTransitioningKeys[keys]) {
+                !this.currentlyTransitioningKeys[key]) {
                 this.keysToEnter.push(key);
             }
         }
@@ -67,7 +79,7 @@ let VelocityTransitionGroup = React.createClass({
             let hasNext = nextChildMapping && nextChildMapping.hasOwnProperty(key);
 
             if(prevChildMapping[key] && !hasNext &&
-                !this.currentlyTransitioningKeys[keys]) {
+                !this.currentlyTransitioningKeys[key]) {
                 this.keysToLeave.push(key);
             }
         }
@@ -117,8 +129,8 @@ let VelocityTransitionGroup = React.createClass({
         return to;
     },
 
-    _getCurrentChildMapping: function () {
-        return TransitionChildMapping.getChildMapping(this.props.children);
+    _getCurrentChildMapping: function (children = this.props.children) {
+        return TransitionChildMapping.getChildMapping(children);
     },
 
     _setCurrentTransitioningKey: function (key) {
@@ -211,7 +223,7 @@ let VelocityTransitionGroup = React.createClass({
         }
     },
 
-    _handleDoneLeaving: function () {
+    _handleDoneLeaving: function (key) {
 
         let component = this.refs[key];
 
@@ -228,7 +240,7 @@ let VelocityTransitionGroup = React.createClass({
             this._performEnter(key);
         } else {
             this.setState(state => {
-                let newChildren = assign({}, state.children);
+                let newChildren = this._assign({}, state.children);
                 delete newChildren[key];
                 return {children: newChildren};
             });
@@ -245,7 +257,8 @@ let VelocityTransitionGroup = React.createClass({
 
             if(child) {
                 childrenToRender.push(React.cloneElement(
-                    this.props.childFactory(child)
+                    this.props.childFactory(child),
+                    {ref: key, key: key}
                 ));
             }
         }
@@ -257,5 +270,51 @@ let VelocityTransitionGroup = React.createClass({
         );
     }
 });
+
+class VelocityTransitionGroup extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    _wrapChild(child) {
+        // see how we could do something like a click and wiggle a button
+        // maybe allow to do something like transitionEnter="fadeIn", calloutEnter="tada"
+        return (
+            <VelocityTransitionGroupChild
+                enter={this.props.enter}
+                enterOptions={this.props.enterOptions}
+                leave={this.props.leave}
+                leaveOptions={this.props.leaveOptions}
+                appear={this.props.appear}
+                appearOptions={this.props.appearOptions}
+                duration={this.props.duration}
+                transitionHeight={this.props.transitionHeight}
+                transitionChild={this.props.transitionChild}
+            >
+                {child}
+            </VelocityTransitionGroupChild>
+        );
+    }
+
+    render() {
+        return (
+            <ReactTransitionGroup {...this.props} childFactory={this._wrapChild.bind(this)} />
+        );
+    }
+}
+
+// VelocityTransitionGroup.propTypes = {
+//     enter: React.PropTypes.string.isRequired, // obj
+//     leave: React.PropTypes.string,
+//     appear: React.PropTypes.oneOfType([
+//       React.PropTypes.string,
+//       React.PropTypes.bool
+//     ]),
+//     transitionHeight: React.PropTypes.bool
+// };
+
+VelocityTransitionGroup.defaultProps = {
+    transitionHeight: false
+};
 
 export default VelocityTransitionGroup;
