@@ -14,12 +14,12 @@ module.exports = {
         loaders: [
             { test: /\.(js|jsx)/, loader: 'babel' },
         ],
-        noParse: [pathToReact]
+        //noParse: [pathToReact]
     },
     resolve: {
-        alias: {
-          'react/addons': pathToReact
-        },
+        // alias: {
+        //   'react/addons': pathToReact
+        // },
         extensions: ['', '.js', '.jsx']
     },
     devServer: {
