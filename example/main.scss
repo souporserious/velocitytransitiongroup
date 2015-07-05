@@ -23,3 +23,29 @@ li {
     background: #78A0B8;
     color: #fff;
 }
+
+.modal {
+    width: 300px;
+    padding: 0 15px;
+    margin: 50px auto 0;
+    border: 1px solid #ccc;
+    text-align: center;
+}
+
+.modal__body {
+    padding: 15px;
+}
+
+.modal__well {
+    height: 100px;
+    margin-bottom: 15px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    line-height: 100px;
+    text-transform: uppercase;
+    border: 1px solid #ccc;
+}
+
+button {
+    margin-top: 15px;
+}

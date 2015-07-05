@@ -66,7 +66,7 @@ var TransitionChildMapping = {
         }
 
         // Finally, add the keys which didn't appear before any key in `next`
-        for(i = 0; i < pendingKeys.length; i++) {
+        for(let i = 0; i < pendingKeys.length; i++) {
             childMapping[pendingKeys[i]] = getValueForKey(pendingKeys[i]);
         }
 
