@@ -12,6 +12,7 @@ module.exports = {
     module: {
         loaders: [
             { test: /\.(jsx)/, exclude: /node_modules/, loader: 'babel' },
+            { test: /\.scss$/, loader: 'style!css!sass?sourceMap' }
         ]
     },
     resolve: {

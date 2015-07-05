@@ -1,28 +1,38 @@
 'use strict';
 
-import React from 'react/addons';
+import React from 'react';
+import Velocity from 'velocity-animate';
 import TransitionChildMapping from './TransitionChildMapping';
-import VelocityTransitionGroupChild from './VelocityTransitionGroupChild';
+import _ from'./utilities';
 
-// TODOS:
-//
-// maybe have a prop to check whether groups will be rendering,
-// this way we can let Velocity handle more performant animations
-// as well as allow them to have things like a stagger animation
-// 
-// we also need to hook up transitionHeight better
+require('velocity-animate/velocity.ui');
 
-let ReactTransitionGroup = React.createClass({
+let VelocityTransitionGroupDefaults = {
+    duration: 350
+};
+
+let VelocityTransitionGroup = React.createClass({
     
     propTypes: {
-        component: React.PropTypes.any,
-        childFactory: React.PropTypes.func
+        component: React.PropTypes.any
     },
 
     getDefaultProps: function () {
         return {
             component: 'span',
-            childFactory: a => a
+            
+            appear: 'transition.slideUpIn',
+            appearOptions: {duration:1000, stagger: 100},
+            
+            enter: 'transition.slideUpIn',
+            enterOptions: {duration: 3000},
+            
+            leave: 'transition.slideDownOut',
+            leaveOptions: {duration: 6000},
+            
+            collection: true, // if you have a collection you want to pass
+            duration: null,
+            wrapper: false // if true a "dummy" div will be used to animate the height before transitioning an element in
         }
     },
 
@@ -36,26 +46,56 @@ let ReactTransitionGroup = React.createClass({
         this.currentlyTransitioningKeys = {};
         this.keysToEnter = [];
         this.keysToLeave = [];
+        this.defaults = VelocityTransitionGroupDefaults;
     },
 
     componentDidMount: function () {
 
         let initialChildMapping = this.state.children;
+        let componentNodes = [];
 
+        // loop through children and perform appear transition
         for(let key in initialChildMapping) {
             if(initialChildMapping[key]) {
-                this._performAppear(key);
+                if(this.props.collection) {
+                    componentNodes.push(this.refs[key].getDOMNode());
+                    this.currentlyTransitioningKeys[key] = true;
+                } else {
+                    this.currentlyTransitioningKeys[key] = true;
+                    this._animate(
+                        this.refs[key].getDOMNode(),
+                        this.props.appear,
+                        this.props.appearOptions,
+                        (function () {
+                            delete this.currentlyTransitioningKeys[key];
+                        }).bind(this)
+                    );
+                }
             }
+        }
+
+        // if this was a collection animate all of them now
+        if(this.props.collection) {
+            this._animate(
+                componentNodes,
+                this.props.appear,
+                this.props.appearOptions,
+                // remove all transitioned keys after completion
+                () => {
+                    for(let key in initialChildMapping) {
+                        if(initialChildMapping[key]) {
+                            delete this.currentlyTransitioningKeys[key];
+                        }
+                    }
+                }
+            );
         }
     },
 
     componentWillReceiveProps: function (nextProps) {
 
-        let nextChildMapping = this._getCurrentChildMapping(nextProps.children);
         let prevChildMapping = this.state.children;
-
-        console.log(prevChildMapping);
-        console.log(nextChildMapping);
+        let nextChildMapping = this._getCurrentChildMapping(nextProps.children);
 
         this.setState({
             children: TransitionChildMapping.mergeChildMappings(
@@ -86,14 +126,97 @@ let ReactTransitionGroup = React.createClass({
     },
 
     componentDidUpdate: function () {
-
+        
+        let nodesToEnter = [];
         let keysToEnter = this.keysToEnter;
         this.keysToEnter = [];
-        keysToEnter.forEach(this._performEnter);
+        
+        keysToEnter.forEach(key => {
+            if(this.props.collection) {
+                nodesToEnter.push(this.refs[key].getDOMNode());
+                this.currentlyTransitioningKeys[key] = true;
+            } else {
+                this.currentlyTransitioningKeys[key] = true;
+                this._animate(
+                    this.refs[key].getDOMNode(),
+                    this.props.enter,
+                    this.props.enterOptions,
+                    (function () {
+                        delete this.currentlyTransitioningKeys[key];
+                    }).bind(this)
+                );
+            }
+        });
 
+        // if this was a collection animate all of them now
+        if(this.props.collection) {
+            this._animate(
+                nodesToEnter,
+                this.props.enter,
+                this.props.enterOptions,
+                // remove all transitioned keys
+                () => {
+                    keysToEnter.forEach(key => {
+                        delete this.currentlyTransitioningKeys[key];
+                    });
+                }
+            );
+        }
+
+        let nodesToLeave = [];
         let keysToLeave = this.keysToLeave;
         this.keysToLeave = [];
-        keysToLeave.forEach(this._performLeave);
+
+        keysToLeave.forEach(key => {
+            if(this.props.collection) {
+                nodesToLeave.push(this.refs[key].getDOMNode());
+                this.currentlyTransitioningKeys[key] = true;
+            } else {
+                
+                this.currentlyTransitioningKeys[key] = true;
+
+                this._animate(
+                    this.refs[key].getDOMNode(),
+                    this.props.leave,
+                    this.props.leaveOptions,
+                    (function () {
+                        delete this.currentlyTransitioningKeys[key];
+
+                        this.setState(state => {
+                            let newChildren = this._assign({}, state.children);
+                            delete newChildren[key];
+                            return {children: newChildren};
+                        });
+                    }).bind(this)
+                );
+            }
+        });
+
+        // if this was a collection animate all of them now
+        if(this.props.collection) {
+            this._animate(
+                nodesToLeave,
+                this.props.leave,
+                this.props.leaveOptions,
+                // remove all transitioned keys
+                () => {
+                    keysToLeave.forEach(key => {
+                        delete this.currentlyTransitioningKeys[key];
+                    });
+
+                    this.setState(state => {
+
+                        let newChildren = this._assign({}, state.children);
+
+                        keysToLeave.forEach(key => {
+                            delete newChildren[key];
+                        });
+
+                        return {children: newChildren};
+                    });
+                }
+            );
+        }
     },
 
     // https://github.com/facebook/react/blob/38acadf6f493926383aec0362617b8507ddee0d8/src/shared/stubs/Object.assign.js
@@ -133,58 +256,20 @@ let ReactTransitionGroup = React.createClass({
         return TransitionChildMapping.getChildMapping(children);
     },
 
-    _setCurrentTransitioningKey: function (key) {
-        this.currentlyTransitioningKeys[key] = true;
-    },
+    _animate: function (elements, properties, options, done) {
 
-    _performAppear: function (key) {
+        // allow user to still be able to pass a complete callback
+        let complete = (options.complete) ? function () {
+            options.complete();
+            done();
+        } : done;
 
-        let component = this.refs[key];
+        // finally, merge defaults and callback into final options
+        options = _.extend(this.defaults, {
+            complete: complete
+        }, options);
 
-        this.currentlyTransitioningKeys[key] = true;
-
-        if(component.componentWillAppear) {
-            component.componentWillAppear(
-                this._handleDoneAppearing.bind(this, key)
-            );
-        } else {
-            this._handleDoneAppearing(key);
-        }
-    },
-
-    _handleDoneAppearing: function (key) {
-
-        let component = this.refs[key];
-
-        if(component.componentDidAppear) {
-            component.componentDidAppear();
-        }
-
-        delete this.currentlyTransitioningKeys[key];
-
-        let currentChildMapping = this._getCurrentChildMapping();
-
-        if(!currentChildMapping || !currentChildMapping.hasOwnProperty(key)) {
-            // this was removed before it had fully appeared, remove it
-            // could handle a reverse state here with Velocity
-            this._performLeave(key);
-        }
-    },
-
-    // very very similar to appear, see if we can refactor
-    _performEnter: function (key) {
-
-        let component = this.refs[key];
-
-        this.currentlyTransitioningKeys[key] = true;
-
-        if(component.componentWillEnter) {
-            component.componentWillEnter(
-                this._handleDoneEntering.bind(this, key)
-            );
-        } else {
-            this._handleDoneEntering(key);
-        }
+        Velocity(elements, properties, options);
     },
 
     _handleDoneEntering: function (key) {
@@ -257,7 +342,7 @@ let ReactTransitionGroup = React.createClass({
 
             if(child) {
                 childrenToRender.push(React.cloneElement(
-                    this.props.childFactory(child),
+                    child,
                     {ref: key, key: key}
                 ));
             }
@@ -270,51 +355,5 @@ let ReactTransitionGroup = React.createClass({
         );
     }
 });
-
-class VelocityTransitionGroup extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
-    _wrapChild(child) {
-        // see how we could do something like a click and wiggle a button
-        // maybe allow to do something like transitionEnter="fadeIn", calloutEnter="tada"
-        return (
-            <VelocityTransitionGroupChild
-                enter={this.props.enter}
-                enterOptions={this.props.enterOptions}
-                leave={this.props.leave}
-                leaveOptions={this.props.leaveOptions}
-                appear={this.props.appear}
-                appearOptions={this.props.appearOptions}
-                duration={this.props.duration}
-                transitionHeight={this.props.transitionHeight}
-                transitionChild={this.props.transitionChild}
-            >
-                {child}
-            </VelocityTransitionGroupChild>
-        );
-    }
-
-    render() {
-        return (
-            <ReactTransitionGroup {...this.props} childFactory={this._wrapChild.bind(this)} />
-        );
-    }
-}
-
-// VelocityTransitionGroup.propTypes = {
-//     enter: React.PropTypes.string.isRequired, // obj
-//     leave: React.PropTypes.string,
-//     appear: React.PropTypes.oneOfType([
-//       React.PropTypes.string,
-//       React.PropTypes.bool
-//     ]),
-//     transitionHeight: React.PropTypes.bool
-// };
-
-VelocityTransitionGroup.defaultProps = {
-    transitionHeight: false
-};
 
 export default VelocityTransitionGroup;

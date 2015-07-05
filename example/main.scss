@@ -1,0 +1,25 @@
+body {
+    padding: 30px;
+    font-family: 'Helvetica';
+}
+
+.app {
+    max-width: 300px;
+    text-align: center;
+}
+
+ul {
+    max-width: 100px;
+    padding: 0;
+    margin: 0 auto;
+    list-style: none;
+}
+
+li {
+    padding: 8px 12px;
+    margin: 8px 0;
+    border-radius: 3px;
+    text-align: center;
+    background: #78A0B8;
+    color: #fff;
+}

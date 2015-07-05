@@ -18,6 +18,9 @@ class VelocityTransitionGroupChild extends React.Component {
 
     _animateParent(parent, height, done, reverse = false) {
 
+        // MAYBE should use sldeDown || slideUp instead of getting height
+        // velocity should take care of display that way
+
         let display = reverse ? null : 'block';
 
         height = reverse ? 0 : [height, 0];

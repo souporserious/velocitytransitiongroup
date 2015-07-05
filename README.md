@@ -1,4 +1,4 @@
-##VelocityTransitionGroup 0.1.1
+##VelocityTransitionGroup 0.2.0
 
 **Docs Coming Soon**
 
@@ -9,7 +9,6 @@
 open your browser and visit: http://localhost:8080/
 
 ###Example Usage
-
     <VelocityTransitionGroup
         component="ul"
         
@@ -39,6 +38,14 @@ open your browser and visit: http://localhost:8080/
         }}
         leaveOptions=""
         appearOptions=""
+
+        /* determines if a group of elements needs to be animated */
+        /* this will allow things like access to stagger animations */
+        /* allows Velocity more perfomant DOM manipulation on groups */
+        collection={}
     >
         {items}
     </VelocityTransitionGroup>
+
+###TODOS
+Check if jQuery is loaded or not since Velocity changes behaivor if it is
