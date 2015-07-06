@@ -14,11 +14,11 @@ let VelocityTransitionGroup = React.createClass({
     getDefaultProps: function () {
         return {
             component: 'span',
-            appear: {{opacity: [1, 0]}},
+            appear: {opacity: [1, 0]},
             appearOptions: {},
-            enter: {{opacity: [1, 0]}},
+            enter: {opacity: [1, 0]},
             enterOptions: {},
-            leave: {{opacity: 0}},
+            leave: {opacity: 0},
             leaveOptions: {},
             duration: 350,
             wrapper: false
@@ -37,6 +37,7 @@ let VelocityTransitionGroup = React.createClass({
         this.keysToLeave = [];
         this.totalHeight = 0;
         this.defaults = {
+            display: 'auto',
             duration: this.props.duration
         };
     },
