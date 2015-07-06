@@ -1,4 +1,4 @@
-##VelocityTransitionGroup 0.2.2
+##VelocityTransitionGroup 0.2.3
 
 **Docs Coming Soon**
 
@@ -43,5 +43,9 @@ open your browser and visit: http://localhost:8080/
 ###Known Bugs
 If changing state before completing any animation it will lose any references between both and return nothing. Need to handle canceling a transition if this happens and return the requested state.
 
+Get total height method called multiple times. Fixing this should fix wrapper element problem.
+
 ###TODOS
+Use wrapper on more than one element. Gathers incorrect height for more than one element right now.
+
 Check if jQuery is loaded or not since Velocity changes behaivor if it is

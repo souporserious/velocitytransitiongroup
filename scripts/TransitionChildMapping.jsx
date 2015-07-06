@@ -16,8 +16,7 @@ var TransitionChildMapping = {
         let mappedChildren = {};
 
         children.forEach(child => {
-            let newChild = wrapper ? React.createElement('div', null, child) : child;
-            mappedChildren[child.key] = newChild;
+            mappedChildren[child.key] = child;
         });
 
         return mappedChildren;
