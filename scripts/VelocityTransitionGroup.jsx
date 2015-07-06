@@ -14,14 +14,13 @@ let VelocityTransitionGroup = React.createClass({
     getDefaultProps: function () {
         return {
             component: 'span',
-            appear: 'transition.fadeIn',
+            appear: {{opacity: [1, 0]}},
             appearOptions: {},
-            enter: 'transition.fadeIn',
+            enter: {{opacity: [1, 0]}},
             enterOptions: {},
-            leave: 'transition.fadeOut',
+            leave: {{opacity: 0}},
             leaveOptions: {},
             duration: 350,
-            // if true a "dummy" div will be used to animate the height before transitioning an element in
             wrapper: false
         }
     },
