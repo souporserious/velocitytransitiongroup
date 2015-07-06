@@ -175,7 +175,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    _getTotalHeight: function _getTotalHeight() {
 
-	        var parent = this.getDOMNode(),
+	        var parent = _react2['default'].findDOMNode(this),
 	            children = parent.children,
 	            length = children.length;
 
@@ -209,7 +209,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var _this2 = this;
 
 	        keys.forEach(function (key) {
-	            var node = _this2.refs[key].getDOMNode();
+	            var node = _react2['default'].findDOMNode(_this2.refs[key]);
 	            node.style.display = 'none';
 	        });
 	    },
@@ -230,7 +230,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }, options);
 
 	        if (this.props.wrapper) {
-	            (0, _velocityAnimate2['default'])(this.getDOMNode(), {
+	            (0, _velocityAnimate2['default'])(_react2['default'].findDOMNode(this), {
 	                height: this.totalHeight
 	            }, {
 	                display: 'block',
@@ -252,7 +252,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // loop through children and store nodes
 	        for (var key in initialChildMapping) {
 	            if (initialChildMapping[key]) {
-	                componentNodes.push(this.refs[key].getDOMNode());
+	                componentNodes.push(_react2['default'].findDOMNode(this.refs[key]));
 	                this.currentlyTransitioningKeys[key] = true;
 	            }
 	        }
@@ -274,7 +274,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var nodesToEnter = [];
 
 	        keysToEnter.forEach(function (key) {
-	            nodesToEnter.push(_this4.refs[key].getDOMNode());
+	            nodesToEnter.push(_react2['default'].findDOMNode(_this4.refs[key]));
 	            _this4.currentlyTransitioningKeys[key] = true;
 	        });
 
@@ -297,7 +297,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        keysToLeave.forEach(function (key) {
-	            nodesToLeave.push(_this5.refs[key].getDOMNode());
+	            nodesToLeave.push(_react2['default'].findDOMNode(_this5.refs[key]));
 	            _this5.currentlyTransitioningKeys[key] = true;
 	        });
 
