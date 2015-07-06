@@ -4,6 +4,34 @@ import React from 'react/addons';
 import VelocityTransitionGroup from './VelocityTransitionGroup';
 import '../example/main.scss';
 
+class InsertDemo extends React.Component {
+    constructor() {
+        super();
+        this.state = {clicked: false};
+    }
+
+    toggle() {
+        this.setState({clicked: !this.state.clicked});
+    }
+
+    render() {
+        return(
+            <div className="box" onClick={this.toggle.bind(this)}>
+                <div className="box__header"></div>
+                <VelocityTransitionGroup
+                    enter="transition.fadeIn"
+                    enterOptions={{delay: 100}}
+                    leave="transition.fadeOut"
+                    duration={450}
+                    wrapper={true}
+                >
+                    {this.state.clicked && <div className="box__inner"></div>}
+                </VelocityTransitionGroup>
+            </div>
+        );
+    }
+}
+
 class ModalDemo extends React.Component {
 
     constructor() {
@@ -40,7 +68,6 @@ class ModalDemo extends React.Component {
                         stagger: 350
                     }}
                     duration={350}
-                    wrapper={true}
                 >
                     {wells}
                 </VelocityTransitionGroup>
@@ -87,6 +114,8 @@ class App extends React.Component {
 
         return(
             <div className="app">
+                <InsertDemo />
+
                 <button onClick={this.handleWells.bind(this, ['main', 'profile', 'contact'])}>1st Set</button>
                 <button onClick={this.handleWells.bind(this, ['help', 'contact'])}>2nd Set</button>
                 <button onClick={this.handleWells.bind(this, ['main', 'about', 'blog', 'help'])}>3rd Set</button>
@@ -99,7 +128,7 @@ class App extends React.Component {
                 <VelocityTransitionGroup
                     component="ul"
                     appearOptions={{
-                        stagger: 350
+                        stagger: 35
                     }}
                 >
                     {items}

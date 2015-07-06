@@ -49,3 +49,23 @@ li {
 button {
     margin-top: 15px;
 }
+
+.box {
+    display: block;
+    width: 250px;
+    background: #E0E4E7;
+    overflow: hidden;
+}
+
+.box__header {
+    display: block;
+    width: 250px;
+    height: 30px;
+}
+
+.box__inner {
+    display: block;
+    width: 250px;
+    height: 200px;
+    background: #57A2CF;
+}

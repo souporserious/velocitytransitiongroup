@@ -1,4 +1,4 @@
-##VelocityTransitionGroup 0.2.1
+##VelocityTransitionGroup 0.2.2
 
 **Docs Coming Soon**
 
@@ -22,7 +22,7 @@ open your browser and visit: http://localhost:8080/
         appear="transition.bounceIn"
         
         /* pass true to transition height and make room to animate element in 
-        ***does not work yet*** */
+        ***only works for single elements as of right now*** */
         wrapper={false}
     
         /* set a default duration for all transitions */

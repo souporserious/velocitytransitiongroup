@@ -38,37 +38,14 @@ let VelocityTransitionGroup = React.createClass({
         this.currentlyTransitioningKeys = {};
         this.keysToEnter = [];
         this.keysToLeave = [];
+        this.totalHeight = 0;
         this.defaults = {
             duration: this.props.duration
         };
     },
 
     componentDidMount: function () {
-
-        let initialChildMapping = this.state.children;
-        let componentNodes = [];
-
-        // loop through children and store nodes
-        for(let key in initialChildMapping) {
-            if(initialChildMapping[key]) {
-                componentNodes.push(this.refs[key].getDOMNode());
-                this.currentlyTransitioningKeys[key] = true;
-            }
-        }
-
-        this._animate(
-            componentNodes,
-            this.props.appear,
-            this.props.appearOptions,
-            // remove all transitioned keys after completion
-            () => {
-                for(let key in initialChildMapping) {
-                    if(initialChildMapping[key]) {
-                        delete this.currentlyTransitioningKeys[key];
-                    }
-                }
-            }
-        );
+        this._appear();
     },
 
     componentWillReceiveProps: function (nextProps) {
@@ -122,20 +99,28 @@ let VelocityTransitionGroup = React.createClass({
     },
 
     _getCurrentChildMapping: function (children = this.props.children) {
-        return TransitionChildMapping.getChildMapping(children);
+        return TransitionChildMapping.getChildMapping(children, this.props.wrapper);
     },
 
     _hideElements: function (keys) {
         keys.forEach(key => {
+            
             let node = this.refs[key].getDOMNode();
+
+            if(this.props.wrapper) {
+                this.totalHeight += node.offsetHeight;
+                node = node.firstChild;
+            }
             node.style.display = 'none';
         });
     },
 
     _animate: function (elements, properties, options, done) {
 
+        if(elements.length <= 0) return;
+
         // allow user to still be able to pass a complete callback
-        let complete = (options.complete) ? function () {
+        let complete = (options.complete) ? () => {
             options.complete();
             done();
         } : done;
@@ -145,11 +130,54 @@ let VelocityTransitionGroup = React.createClass({
             complete: complete
         }, options);
 
+        if(this.props.wrapper) {
+
+            elements = elements[0];
+
+            Velocity(
+                elements,
+                {
+                    height: this.totalHeight
+                }, {
+                    duration: options.duration
+                }
+            );
+
+            elements = elements.firstChild;
+        }
+
         Velocity(elements, properties, options);
     },
 
     _appear: function () {
 
+        let initialChildMapping = this.state.children;
+        let componentNodes = [];
+
+        if(!initialChildMapping) return;
+
+        // loop through children and store nodes
+        for(let key in initialChildMapping) {
+            if(initialChildMapping[key]) {
+                componentNodes.push(this.refs[key].getDOMNode());
+                this.currentlyTransitioningKeys[key] = true;
+            }
+        }
+
+        this._animate(
+            componentNodes,
+            this.props.appear,
+            this.props.appearOptions,
+            // remove all transitioned keys after completion
+            () => {
+                for(let key in initialChildMapping) {
+                    if(initialChildMapping[key]) {
+                        delete this.currentlyTransitioningKeys[key];
+                    }
+                }
+                this.totalHeight = 0;
+            }
+        );
     },
 
     _enter: function (keysToEnter) {
@@ -170,6 +198,7 @@ let VelocityTransitionGroup = React.createClass({
                 keysToEnter.forEach(key => {
                     delete this.currentlyTransitioningKeys[key];
                 });
+                this.totalHeight = 0;
             }
         );
     },

@@ -1,8 +1,10 @@
 'use strict';
 
+import React from 'react';
+
 var TransitionChildMapping = {
 
-    getChildMapping: function(children) {
+    getChildMapping: function(children, wrapper = false) {
 
         if(!children) return children;
 
@@ -14,7 +16,8 @@ var TransitionChildMapping = {
         let mappedChildren = {};
 
         children.forEach(child => {
-            mappedChildren[child.key] = child;
+            let newChild = wrapper ? React.createElement('div', null, child) : child;
+            mappedChildren[child.key] = newChild;
         });
 
         return mappedChildren;
