@@ -4,6 +4,8 @@ import React from 'react/addons';
 import VelocityTransitionGroup from './VelocityTransitionGroup';
 import '../example/main.scss';
 
+require('velocity-animate/velocity.ui');
+
 class InsertDemo extends React.Component {
     constructor() {
         super();

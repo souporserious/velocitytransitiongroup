@@ -5,8 +5,6 @@ import React from 'react';
 import Velocity from 'velocity-animate';
 import TransitionChildMapping from './TransitionChildMapping';
 
-require('velocity-animate/velocity.ui');
-
 let VelocityTransitionGroup = React.createClass({
     
     propTypes: {
