@@ -1,12 +1,12 @@
 {
   "name": "velocitytransitiongroup",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "homepage": "https://github.com/souporserious/velocitytransitiongroup",
   "authors": [
     "Travis Arnold <ftntravis@gmail.com>"
   ],
   "description": "React addon component to easily use Velocity animations in React.",
-  "main": "dist/VelocityTransitionGroup.min.js",
+  "main": ["./dist/VelocityTransitionGroup.js", "./dist/VelocityTransitionGroup.min.js"],
   "keywords": [
     "react",
     "velocity",

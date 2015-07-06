@@ -24,7 +24,7 @@ var config = {
         extensions: ['', '.js', '.jsx']
     },
     externals: {
-        'react/addons': 'React',
+        'react': 'React',
         'velocity-animate': 'Velocity',
         'velocity-animate/velocity.ui': 'velocity-animate/velocity.ui'
     },

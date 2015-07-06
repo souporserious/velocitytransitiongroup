@@ -1,6 +1,6 @@
 'use strict';
 
-import _ from 'lodash';
+import _ from './utilities';
 import React from 'react';
 import Velocity from 'velocity-animate';
 import TransitionChildMapping from './TransitionChildMapping';

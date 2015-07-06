@@ -7,7 +7,7 @@
 		exports["VelocityTransitionGroup"] = factory(require("React"), require("Velocity"), require("velocity-animate/velocity.ui"));
 	else
 		root["VelocityTransitionGroup"] = factory(root["React"], root["Velocity"], root["velocity-animate/velocity.ui"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_3__, __WEBPACK_EXTERNAL_MODULE_5__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_2__, __WEBPACK_EXTERNAL_MODULE_3__, __WEBPACK_EXTERNAL_MODULE_5__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -56,233 +56,346 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	var _utilities = __webpack_require__(1);
 
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	var _utilities2 = _interopRequireDefault(_utilities);
 
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
+	var _react = __webpack_require__(2);
 
-	var React = __webpack_require__(1);
-	var ReactTransitionGroup = React.addons.TransitionGroup;
-	var VelocityTransitionGroupChild = __webpack_require__(2);
+	var _react2 = _interopRequireDefault(_react);
 
-	var VelocityTransitionGroup = (function (_React$Component) {
-	    function VelocityTransitionGroup(props) {
-	        _classCallCheck(this, VelocityTransitionGroup);
+	var _velocityAnimate = __webpack_require__(3);
 
-	        _get(Object.getPrototypeOf(VelocityTransitionGroup.prototype), 'constructor', this).call(this, props);
+	var _velocityAnimate2 = _interopRequireDefault(_velocityAnimate);
+
+	var _TransitionChildMapping = __webpack_require__(4);
+
+	var _TransitionChildMapping2 = _interopRequireDefault(_TransitionChildMapping);
+
+	__webpack_require__(5);
+
+	var VelocityTransitionGroup = _react2['default'].createClass({
+	    displayName: 'VelocityTransitionGroup',
+
+	    propTypes: {
+	        component: _react2['default'].PropTypes.any
+	    },
+
+	    getDefaultProps: function getDefaultProps() {
+	        return {
+	            component: 'span',
+	            appear: 'transition.fadeIn',
+	            appearOptions: {},
+	            enter: 'transition.fadeIn',
+	            enterOptions: {},
+	            leave: 'transition.fadeOut',
+	            leaveOptions: {},
+	            duration: 350,
+	            // if true a "dummy" div will be used to animate the height before transitioning an element in
+	            wrapper: false
+	        };
+	    },
+
+	    getInitialState: function getInitialState() {
+	        return {
+	            children: this._getCurrentChildMapping()
+	        };
+	    },
+
+	    componentWillMount: function componentWillMount() {
+	        this.currentlyTransitioningKeys = {};
+	        this.keysToEnter = [];
+	        this.keysToLeave = [];
+	        this.totalHeight = 0;
+	        this.defaults = {
+	            duration: this.props.duration
+	        };
+	    },
+
+	    componentDidMount: function componentDidMount() {
+	        this._appear();
+	    },
+
+	    componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+
+	        var prevChildMapping = this.state.children;
+	        var nextChildMapping = this._getCurrentChildMapping(nextProps.children);
+
+	        this.setState({
+	            children: _TransitionChildMapping2['default'].mergeChildMappings(prevChildMapping, nextChildMapping)
+	        });
+
+	        for (var key in nextChildMapping) {
+
+	            var hasPrev = prevChildMapping && prevChildMapping.hasOwnProperty(key);
+
+	            if (nextChildMapping[key] && !hasPrev && !this.currentlyTransitioningKeys[key]) {
+	                this.keysToEnter.push(key);
+	            }
+	        }
+
+	        for (var key in prevChildMapping) {
+
+	            var hasNext = nextChildMapping && nextChildMapping.hasOwnProperty(key);
+
+	            if (prevChildMapping[key] && !hasNext && !this.currentlyTransitioningKeys[key]) {
+	                this.keysToLeave.push(key);
+	            }
+	        }
+	    },
+
+	    componentDidUpdate: function componentDidUpdate() {
+	        var _this = this;
+
+	        var keysToEnter = this.keysToEnter;
+	        this.keysToEnter = [];
+
+	        var keysToLeave = this.keysToLeave;
+	        this.keysToLeave = [];
+
+	        this.totalHeight = 0;
+
+	        this._leave(keysToLeave, function () {
+
+	            _this._getTotalHeight();
+
+	            if (keysToEnter.length > 0) {
+	                _this._hideElements(keysToEnter);
+	            }
+
+	            _this._enter(keysToEnter);
+	        });
+	    },
+
+	    _getTotalHeight: function _getTotalHeight() {
+
+	        var parent = this.getDOMNode(),
+	            children = parent.children,
+	            length = children.length;
+
+	        function outerHeight(el) {
+
+	            var height = el.offsetHeight,
+	                style = getComputedStyle(el);
+
+	            height += parseInt(style.marginTop) + parseInt(style.marginBottom);
+
+	            return height;
+	        }
+
+	        if (length <= 0) {
+	            this.totalHeight = 0;
+	            return;
+	        }
+
+	        for (var i = 0; i < length; i++) {
+	            this.totalHeight += outerHeight(children[i]);
+	        }
+	    },
+
+	    _getCurrentChildMapping: function _getCurrentChildMapping() {
+	        var children = arguments[0] === undefined ? this.props.children : arguments[0];
+
+	        return _TransitionChildMapping2['default'].getChildMapping(children, this.props.wrapper);
+	    },
+
+	    _hideElements: function _hideElements(keys) {
+	        var _this2 = this;
+
+	        keys.forEach(function (key) {
+	            var node = _this2.refs[key].getDOMNode();
+	            node.style.display = 'none';
+	        });
+	    },
+
+	    _animate: function _animate(elements, properties, options, done) {
+
+	        if (elements.length <= 0) return;
+
+	        // allow user to still be able to pass a complete callback
+	        var complete = options.complete ? function () {
+	            options.complete();
+	            done();
+	        } : done;
+
+	        // finally, merge defaults and callback into final options
+	        options = _utilities2['default'].assign(this.defaults, {
+	            complete: complete
+	        }, options);
+
+	        if (this.props.wrapper) {
+	            (0, _velocityAnimate2['default'])(this.getDOMNode(), {
+	                height: this.totalHeight
+	            }, {
+	                display: 'block',
+	                duration: options.duration
+	            });
+	        }
+
+	        (0, _velocityAnimate2['default'])(elements, properties, options);
+	    },
+
+	    _appear: function _appear() {
+	        var _this3 = this;
+
+	        var initialChildMapping = this.state.children;
+	        var componentNodes = [];
+
+	        if (!initialChildMapping) return;
+
+	        // loop through children and store nodes
+	        for (var key in initialChildMapping) {
+	            if (initialChildMapping[key]) {
+	                componentNodes.push(this.refs[key].getDOMNode());
+	                this.currentlyTransitioningKeys[key] = true;
+	            }
+	        }
+
+	        this._animate(componentNodes, this.props.appear, this.props.appearOptions,
+	        // remove all transitioned keys after completion
+	        function () {
+	            for (var key in initialChildMapping) {
+	                if (initialChildMapping[key]) {
+	                    delete _this3.currentlyTransitioningKeys[key];
+	                }
+	            }
+	        });
+	    },
+
+	    _enter: function _enter(keysToEnter) {
+	        var _this4 = this;
+
+	        var nodesToEnter = [];
+
+	        keysToEnter.forEach(function (key) {
+	            nodesToEnter.push(_this4.refs[key].getDOMNode());
+	            _this4.currentlyTransitioningKeys[key] = true;
+	        });
+
+	        this._animate(nodesToEnter, this.props.enter, this.props.enterOptions,
+	        // remove all transitioned keys
+	        function () {
+	            keysToEnter.forEach(function (key) {
+	                delete _this4.currentlyTransitioningKeys[key];
+	            });
+	        });
+	    },
+
+	    _leave: function _leave(keysToLeave, done) {
+	        var _this5 = this;
+
+	        var nodesToLeave = [];
+
+	        if (keysToLeave.length <= 0) {
+	            done();
+	        }
+
+	        keysToLeave.forEach(function (key) {
+	            nodesToLeave.push(_this5.refs[key].getDOMNode());
+	            _this5.currentlyTransitioningKeys[key] = true;
+	        });
+
+	        this._animate(nodesToLeave, this.props.leave, this.props.leaveOptions,
+	        // remove all transitioned keys
+	        function () {
+	            // delete keys now the we've finished transitioning
+	            keysToLeave.forEach(function (key) {
+	                delete _this5.currentlyTransitioningKeys[key];
+	            });
+
+	            // set the state of our new children and delete any
+	            // keysToLeave stored
+	            _this5.setState(function (state) {
+
+	                var newChildren = _utilities2['default'].assign({}, state.children);
+
+	                keysToLeave.forEach(function (key) {
+	                    delete newChildren[key];
+	                });
+
+	                return { children: newChildren };
+	            }, done);
+	        });
+	    },
+
+	    render: function render() {
+
+	        var childrenToRender = [];
+
+	        for (var key in this.state.children) {
+
+	            var child = this.state.children[key];
+
+	            if (child) {
+	                var newChild = _react2['default'].cloneElement(child, { ref: key, key: key });
+
+	                childrenToRender.push(newChild);
+	            }
+	        }
+
+	        return _react2['default'].createElement(this.props.component, this.props, childrenToRender);
 	    }
+	});
 
-	    _inherits(VelocityTransitionGroup, _React$Component);
-
-	    _createClass(VelocityTransitionGroup, [{
-	        key: '_wrapChild',
-	        value: function _wrapChild(child) {
-	            // see how we could do something like a click and wiggle a button
-	            // maybe allow to do something like transitionEnter="fadeIn", calloutEnter="tada"
-	            return React.createElement(
-	                VelocityTransitionGroupChild,
-	                {
-	                    enter: this.props.enter,
-	                    enterOptions: this.props.enterOptions,
-	                    leave: this.props.leave,
-	                    leaveOptions: this.props.leaveOptions,
-	                    appear: this.props.appear,
-	                    appearOptions: this.props.appearOptions,
-	                    duration: this.props.duration,
-	                    transitionHeight: this.props.transitionHeight,
-	                    transitionChild: this.props.transitionChild
-	                },
-	                child
-	            );
-	        }
-	    }, {
-	        key: 'render',
-	        value: function render() {
-	            return React.createElement(ReactTransitionGroup, _extends({}, this.props, { childFactory: this._wrapChild.bind(this) }));
-	        }
-	    }]);
-
-	    return VelocityTransitionGroup;
-	})(React.Component);
-
-	// VelocityTransitionGroup.propTypes = {
-	//     enter: React.PropTypes.string.isRequired, // obj
-	//     leave: React.PropTypes.string,
-	//     appear: React.PropTypes.oneOfType([
-	//       React.PropTypes.string,
-	//       React.PropTypes.bool
-	//     ]),
-	//     transitionHeight: React.PropTypes.bool
-	// };
-
-	VelocityTransitionGroup.defaultProps = {
-	    transitionHeight: false
-	};
-
-	module.exports = VelocityTransitionGroup;
+	exports['default'] = VelocityTransitionGroup;
+	module.exports = exports['default'];
 
 /***/ },
 /* 1 */
 /***/ function(module, exports) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	exports['default'] = {
+	    // https://github.com/facebook/react/blob/38acadf6f493926383aec0362617b8507ddee0d8/src/shared/stubs/Object.assign.js
+	    assign: function assign(target, sources) {
+
+	        if (target == null) {
+	            throw new TypeError('Object.assign target cannot be null or undefined');
+	        }
+
+	        var to = Object(target);
+	        var hasOwnProperty = Object.prototype.hasOwnProperty;
+
+	        for (var nextIndex = 1; nextIndex < arguments.length; nextIndex++) {
+
+	            var nextSource = arguments[nextIndex];
+
+	            if (nextSource == null) continue;
+
+	            var from = Object(nextSource);
+
+	            // We don't currently support accessors nor proxies. Therefore this
+	            // copy cannot throw. If we ever supported this then we must handle
+	            // exceptions and side-effects. We don't support symbols so they won't
+	            // be transferred.
+
+	            for (var key in from) {
+	                if (hasOwnProperty.call(from, key)) {
+	                    to[key] = from[key];
+	                }
+	            }
+	        }
+
+	        return to;
+	    }
+	};
+	module.exports = exports['default'];
 
 /***/ },
 /* 2 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	'use strict';
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	var _get = function get(_x3, _x4, _x5) { var _again = true; _function: while (_again) { var object = _x3, property = _x4, receiver = _x5; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x3 = parent; _x4 = property; _x5 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
-
-	var React = __webpack_require__(1);
-	var Velocity = __webpack_require__(3);
-	var _ = __webpack_require__(4);
-
-	__webpack_require__(5);
-
-	var VelocityTransitionGroupChild = (function (_React$Component) {
-	    function VelocityTransitionGroupChild(props) {
-	        _classCallCheck(this, VelocityTransitionGroupChild);
-
-	        _get(Object.getPrototypeOf(VelocityTransitionGroupChild.prototype), 'constructor', this).call(this, props);
-	        this.defaults = {
-	            display: 'auto',
-	            duration: this.props.duration || 350
-	        };
-	    }
-
-	    _inherits(VelocityTransitionGroupChild, _React$Component);
-
-	    _createClass(VelocityTransitionGroupChild, [{
-	        key: '_animateParent',
-	        value: function _animateParent(parent, height, done) {
-	            var reverse = arguments[3] === undefined ? false : arguments[3];
-
-	            var display = reverse ? null : 'block';
-
-	            height = reverse ? 0 : [height, 0];
-
-	            // make sure parent is hidden before rendering
-	            if (!reverse) {
-	                parent.style.display = 'none';
-	                parent.style.overflow = 'hidden';
-	            }
-
-	            Velocity(parent, {
-	                height: height
-	            }, {
-	                display: display,
-	                duration: this.defaults.duration,
-	                complete: done
-	            });
-	        }
-	    }, {
-	        key: '_animateChild',
-	        value: function _animateChild(node, props, options, done) {
-	            var _this = this;
-
-	            var reverse = arguments[4] === undefined ? false : arguments[4];
-
-	            var parent = this.props.transitionChild ? node : node.parentNode;
-	            var child = this.props.transitionChild ? node.querySelector(this.props.transitionChild) : node;
-
-	            // allow user to still be able to pass a complete callback
-	            // need to call component callback no matter what
-	            var _complete = options.complete ? function () {
-	                options.complete();
-	                done();
-	            } : done;
-
-	            // merge defaults and complete function into final options
-	            options = _.extend(this.defaults, {
-	                complete: _complete
-	            }, options);
-
-	            if (this.props.transitionHeight) {
-	                (function () {
-
-	                    var height = node.offsetHeight;
-
-	                    // hide child until we show it
-	                    child.style.opacity = 0;
-
-	                    // pass everything to Velocity to handle animations
-	                    if (reverse) {
-	                        // flip complete functions since it's in reverse
-	                        options = _.extend(options, {
-	                            complete: function complete() {
-	                                _this._animateParent(parent, height, _complete, true);
-	                            }
-	                        });
-	                        Velocity(child, props, options);
-	                    } else {
-	                        _this._animateParent(parent, height, function () {
-	                            Velocity(child, props, options);
-	                        });
-	                    }
-	                })();
-	            } else {
-	                Velocity(node, props, options);
-	            }
-	        }
-	    }, {
-	        key: 'componentWillAppear',
-	        value: function componentWillAppear(done) {
-
-	            var props = this.props.appear !== false ? this.props.appear || this.props.enter : null;
-
-	            if (props) {
-	                // get the current child node
-	                var node = React.findDOMNode(this);
-
-	                // default to enter options if none provided for appear or false was not passed
-	                var options = this.props.appear !== false ? this.props.appearOptions || {} : this.enterOptions;
-
-	                this._animateChild(node, props, options, done);
-	            }
-	        }
-	    }, {
-	        key: 'componentWillEnter',
-	        value: function componentWillEnter(done) {
-	            var node = React.findDOMNode(this);
-	            var options = this.props.enterOptions || {};
-
-	            this._animateChild(node, this.props.enter, options, done);
-	        }
-	    }, {
-	        key: 'componentWillLeave',
-	        value: function componentWillLeave(done) {
-	            // bail if no leave transition provided
-	            if (typeof this.props.leave === 'undefined') return;
-
-	            var node = React.findDOMNode(this);
-	            var options = this.props.leaveOptions || {};
-
-	            this._animateChild(node, this.props.leave, options, done, true);
-	        }
-	    }, {
-	        key: 'render',
-	        value: function render() {
-	            return React.Children.only(this.props.children);
-	        }
-	    }]);
-
-	    return VelocityTransitionGroupChild;
-	})(React.Component);
-
-	module.exports = VelocityTransitionGroupChild;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_2__;
 
 /***/ },
 /* 3 */
@@ -292,32 +405,92 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 4 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	module.exports = {
-	    extend: function extend() {
-	        for (var _len = arguments.length, objs = Array(_len), _key = 0; _key < _len; _key++) {
-	            objs[_key] = arguments[_key];
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var TransitionChildMapping = {
+
+	    getChildMapping: function getChildMapping(children) {
+	        var wrapper = arguments[1] === undefined ? false : arguments[1];
+
+	        if (!children) return children;
+
+	        // if only child make sure we return an array still
+	        if (!Array.isArray(children)) {
+	            children = [children];
 	        }
 
-	        var out = {},
-	            objsLength = objs.length;
+	        var mappedChildren = {};
 
-	        for (var i = 0; i < objsLength; i++) {
-	            if (!objs[i]) continue;
+	        children.forEach(function (child) {
+	            mappedChildren[child.key] = child;
+	        });
 
-	            for (var key in objs[i]) {
-	                if (objs[i].hasOwnProperty(key)) {
-	                    out[key] = objs[i][key];
-	                }
+	        return mappedChildren;
+	    },
+
+	    mergeChildMappings: function mergeChildMappings() {
+	        var prev = arguments[0] === undefined ? {} : arguments[0];
+	        var next = arguments[1] === undefined ? {} : arguments[1];
+
+	        function getValueForKey(key) {
+	            if (next.hasOwnProperty(key)) {
+	                return next[key];
+	            } else {
+	                return prev[key];
 	            }
 	        }
 
-	        return out;
+	        // For each key of `next`, the list of keys to insert before that key in
+	        // the combined list
+	        var nextKeysPending = {};
+
+	        var pendingKeys = [];
+
+	        for (var prevKey in prev) {
+	            if (next.hasOwnProperty(prevKey)) {
+	                if (pendingKeys.length) {
+	                    nextKeysPending[prevKey] = pendingKeys;
+	                    pendingKeys = [];
+	                }
+	            } else {
+	                pendingKeys.push(prevKey);
+	            }
+	        }
+
+	        var childMapping = {};
+
+	        for (var nextKey in next) {
+
+	            if (nextKeysPending.hasOwnProperty(nextKey)) {
+
+	                for (var i = 0; i < nextKeysPending[nextKey].length; i++) {
+
+	                    var pendingNextKey = nextKeysPending[nextKey][i];
+
+	                    childMapping[nextKeysPending[nextKey][i]] = getValueForKey(pendingNextKey);
+	                }
+	            }
+	            childMapping[nextKey] = getValueForKey(nextKey);
+	        }
+
+	        // Finally, add the keys which didn't appear before any key in `next`
+	        for (var i = 0; i < pendingKeys.length; i++) {
+	            childMapping[pendingKeys[i]] = getValueForKey(pendingKeys[i]);
+	        }
+
+	        return childMapping;
 	    }
 	};
+
+	module.exports = TransitionChildMapping;
 
 /***/ },
 /* 5 */

@@ -1,6 +1,6 @@
 {
   "name": "velocitytransitiongroup",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "React addon component to easily use Velocity animations in React.",
   "main": "scripts/index.jsx",
   "scripts": {
@@ -34,10 +34,8 @@
   "devDependencies": {
     "babel-core": "^5.6.15",
     "babel-loader": "^5.2.2",
-    "babel-plugin-object-assign": "^1.2.0",
     "css-loader": "^0.15.1",
     "http-server": "^0.8.0",
-    "lodash": "^3.10.0",
     "node-libs-browser": "^0.5.2",
     "node-sass": "^3.2.0",
     "sass-loader": "^1.0.2",
