@@ -1,4 +1,4 @@
-##VelocityTransitionGroup 0.2.5
+##VelocityTransitionGroup 0.2.6
 
 **Docs Coming Soon**
 

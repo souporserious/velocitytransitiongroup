@@ -10,7 +10,7 @@ var config = {
         path: path.join(__dirname, 'dist'),
         publicPath: 'dist/',
         filename: 'VelocityTransitionGroup.js',
-        sourceMapFilename: 'VelocityTransitionGroup.js',
+        sourceMapFilename: 'VelocityTransitionGroup.map',
         library: 'VelocityTransitionGroup',
         libraryTarget: 'umd'
     },
@@ -24,15 +24,24 @@ var config = {
         extensions: ['', '.js', '.jsx']
     },
     externals: {
-        'react': 'React',
-        'velocity-animate': 'Velocity',
-        'velocity-animate/velocity.ui': 'velocity-animate/velocity.ui'
+        'react': {
+            root: 'React',
+            commonjs2: 'react',
+            commonjs: 'react',
+            amd: 'react'
+        },
+        'velocity-animate': {
+            root: 'Velocity',
+            commonjs2: 'velocity-animate',
+            commonjs: 'velocity-animate',
+            amd: 'velocity-animate'
+        }
     },
 };
 
 if(TARGET === 'minify') {
     config.output.filename = 'VelocityTransitionGroup.min.js';
-    config.output.sourceMapFilename = 'VelocityTransitionGroup.min.js';
+    config.output.sourceMapFilename = 'VelocityTransitionGroup.min.map';
     config.plugins.push(new webpack.optimize.UglifyJsPlugin({
         compress: {
             warnings: false
