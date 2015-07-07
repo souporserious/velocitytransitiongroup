@@ -14,13 +14,13 @@ let VelocityTransitionGroup = React.createClass({
     getDefaultProps: function () {
         return {
             component: 'span',
-            appear: {opacity: [1, 0]},
-            appearOptions: {},
+            appear: null,
+            appearOptions: null,
             enter: {opacity: [1, 0]},
             enterOptions: {},
             leave: {opacity: 0},
             leaveOptions: {},
-            duration: 350,
+            defaults: {},
             wrapper: false
         }
     },
@@ -35,11 +35,12 @@ let VelocityTransitionGroup = React.createClass({
         this.currentlyTransitioningKeys = {};
         this.keysToEnter = [];
         this.keysToLeave = [];
+        this.prevChildMapping = null;
+        this.nextChildMapping = null;
         this.totalHeight = 0;
-        this.defaults = {
-            display: 'auto',
-            duration: this.props.duration
-        };
+        this.defaults = _.assign({
+            display: 'auto'
+        }, this.props.defaults);
     },
 
     componentDidMount: function () {
@@ -48,9 +49,13 @@ let VelocityTransitionGroup = React.createClass({
 
     componentWillReceiveProps: function (nextProps) {
 
-        let prevChildMapping = this.state.children;
-        let nextChildMapping = this._getCurrentChildMapping(nextProps.children);
+        this.prevChildMapping = this.state.children;
+        this.nextChildMapping = this._getCurrentChildMapping(nextProps.children);
 
+        let prevChildMapping = this.prevChildMapping;
+        let nextChildMapping = this.nextChildMapping;
+
+        // set current and next children to current state
         this.setState({
             children: TransitionChildMapping.mergeChildMappings(
                 prevChildMapping,
@@ -87,25 +92,31 @@ let VelocityTransitionGroup = React.createClass({
         let keysToLeave = this.keysToLeave;
         this.keysToLeave = [];
 
-        this.totalHeight = 0;
+        // if same keys bail out
+        if(keysToEnter.length <= 0 && keysToLeave.length <= 0) {
+            return;
+        }
 
-        this._leave(keysToLeave, () => {
-            
-            this._getTotalHeight();
-        
-            if(keysToEnter.length > 0) {
-                this._hideElements(keysToEnter);
-            }
+        if(this.props.wrapper) {
+            // reset height before gathering it
+            this.totalHeight = 0;
+            this.totalHeight = this._getTotalHeight(this.nextChildMapping);
 
+            // hide elements so they don't appear when transitioning wrapper
+            this._hideElements(keysToEnter);
+        }
+
+        // just enter if keys to leave are empty
+        if(keysToLeave.length <= 0) {
             this._enter(keysToEnter);
-        });
+        } else {
+            this._leave(keysToLeave, () => {
+                this._enter(keysToEnter);
+            });
+        }
     },
 
-    _getTotalHeight: function () {
-
-        let parent = React.findDOMNode(this),
-            children = parent.children,
-            length = children.length;
+    _getTotalHeight: function (childMapping) {
 
         function outerHeight(el) {
 
@@ -117,18 +128,18 @@ let VelocityTransitionGroup = React.createClass({
             return height;
         }
 
-        if(length <= 0) {
-            this.totalHeight = 0;
-            return;
+        let totalHeight = 0;
+
+        for(let key in childMapping) {
+            let node = React.findDOMNode(this.refs[key]);
+            totalHeight += outerHeight(node);
         }
 
-        for(let i = 0; i < length; i++) {
-            this.totalHeight += outerHeight(children[i]);
-        }
+        return totalHeight;
     },
 
     _getCurrentChildMapping: function (children = this.props.children) {
-        return TransitionChildMapping.getChildMapping(children, this.props.wrapper);
+        return TransitionChildMapping.getChildMapping(children);
     },
 
     _hideElements: function (keys) {
@@ -183,10 +194,13 @@ let VelocityTransitionGroup = React.createClass({
             }
         }
 
+        let properties = this.props.appear !== null ? this.props.appear : this.props.enter,
+            options = this.props.appearOptions !== null ? this.props.appearOptions : this.props.enterOptions;
+
         this._animate(
             componentNodes,
-            this.props.appear,
-            this.props.appearOptions,
+            properties,
+            options,
             // remove all transitioned keys after completion
             () => {
                 for(let key in initialChildMapping) {
@@ -222,6 +236,27 @@ let VelocityTransitionGroup = React.createClass({
 
     _leave: function (keysToLeave, done) {
 
+        let updateChildren = () => {
+
+            // delete keys now the we've finished transitioning
+            keysToLeave.forEach(key => {
+                delete this.currentlyTransitioningKeys[key];
+            });
+
+            // delete any keysToLeave since they've transitioned out
+            // set the new children to current state
+            this.setState(state => {
+
+                let newChildren = _.assign({}, state.children);
+
+                keysToLeave.forEach(key => {
+                    delete newChildren[key];
+                });
+
+                return {children: newChildren};
+            }, done);
+        }
+
         let nodesToLeave = [];
 
         if(keysToLeave.length <= 0) {
@@ -233,30 +268,16 @@ let VelocityTransitionGroup = React.createClass({
             this.currentlyTransitioningKeys[key] = true;
         });
 
+        if(this.props.leave === false) {
+            updateChildren();
+            return;
+        }
+
         this._animate(
             nodesToLeave,
             this.props.leave,
             this.props.leaveOptions,
-            // remove all transitioned keys
-            () => {
-                // delete keys now the we've finished transitioning
-                keysToLeave.forEach(key => {
-                    delete this.currentlyTransitioningKeys[key];
-                });
-
-                // set the state of our new children and delete any
-                // keysToLeave stored
-                this.setState(state => {
-
-                    let newChildren = _.assign({}, state.children);
-
-                    keysToLeave.forEach(key => {
-                        delete newChildren[key];
-                    });
-
-                    return {children: newChildren};
-                }, done);
-            }
+            updateChildren
         );
     },
 

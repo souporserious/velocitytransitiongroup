@@ -88,13 +88,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            component: 'span',
-	            appear: { opacity: [1, 0] },
-	            appearOptions: {},
+	            appear: null,
+	            appearOptions: null,
 	            enter: { opacity: [1, 0] },
 	            enterOptions: {},
 	            leave: { opacity: 0 },
 	            leaveOptions: {},
-	            duration: 350,
+	            defaults: {},
 	            wrapper: false
 	        };
 	    },
@@ -109,11 +109,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.currentlyTransitioningKeys = {};
 	        this.keysToEnter = [];
 	        this.keysToLeave = [];
+	        this.prevChildMapping = null;
+	        this.nextChildMapping = null;
 	        this.totalHeight = 0;
-	        this.defaults = {
-	            display: 'auto',
-	            duration: this.props.duration
-	        };
+	        this.defaults = _utilities2['default'].assign({
+	            display: 'auto'
+	        }, this.props.defaults);
 	    },
 
 	    componentDidMount: function componentDidMount() {
@@ -122,9 +123,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
 
-	        var prevChildMapping = this.state.children;
-	        var nextChildMapping = this._getCurrentChildMapping(nextProps.children);
+	        this.prevChildMapping = this.state.children;
+	        this.nextChildMapping = this._getCurrentChildMapping(nextProps.children);
 
+	        var prevChildMapping = this.prevChildMapping;
+	        var nextChildMapping = this.nextChildMapping;
+
+	        // set current and next children to current state
 	        this.setState({
 	            children: _TransitionChildMapping2['default'].mergeChildMappings(prevChildMapping, nextChildMapping)
 	        });
@@ -157,25 +162,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var keysToLeave = this.keysToLeave;
 	        this.keysToLeave = [];
 
-	        this.totalHeight = 0;
+	        // if same keys bail out
+	        if (keysToEnter.length <= 0 && keysToLeave.length <= 0) {
+	            return;
+	        }
 
-	        this._leave(keysToLeave, function () {
+	        if (this.props.wrapper) {
+	            // reset height before gathering it
+	            this.totalHeight = 0;
+	            this.totalHeight = this._getTotalHeight(this.nextChildMapping);
 
-	            _this._getTotalHeight();
+	            // hide elements so they don't appear when transitioning wrapper
+	            this._hideElements(keysToEnter);
+	        }
 
-	            if (keysToEnter.length > 0) {
-	                _this._hideElements(keysToEnter);
-	            }
-
-	            _this._enter(keysToEnter);
-	        });
+	        // just enter if keys to leave are empty
+	        if (keysToLeave.length <= 0) {
+	            this._enter(keysToEnter);
+	        } else {
+	            this._leave(keysToLeave, function () {
+	                _this._enter(keysToEnter);
+	            });
+	        }
 	    },
 
-	    _getTotalHeight: function _getTotalHeight() {
-
-	        var parent = _react2['default'].findDOMNode(this),
-	            children = parent.children,
-	            length = children.length;
+	    _getTotalHeight: function _getTotalHeight(childMapping) {
 
 	        function outerHeight(el) {
 
@@ -187,20 +198,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return height;
 	        }
 
-	        if (length <= 0) {
-	            this.totalHeight = 0;
-	            return;
+	        var totalHeight = 0;
+
+	        for (var key in childMapping) {
+	            var node = _react2['default'].findDOMNode(this.refs[key]);
+	            totalHeight += outerHeight(node);
 	        }
 
-	        for (var i = 0; i < length; i++) {
-	            this.totalHeight += outerHeight(children[i]);
-	        }
+	        return totalHeight;
 	    },
 
 	    _getCurrentChildMapping: function _getCurrentChildMapping() {
 	        var children = arguments[0] === undefined ? this.props.children : arguments[0];
 
-	        return _TransitionChildMapping2['default'].getChildMapping(children, this.props.wrapper);
+	        return _TransitionChildMapping2['default'].getChildMapping(children);
 	    },
 
 	    _hideElements: function _hideElements(keys) {
@@ -255,7 +266,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 
-	        this._animate(componentNodes, this.props.appear, this.props.appearOptions,
+	        var properties = this.props.appear !== null ? this.props.appear : this.props.enter,
+	            options = this.props.appearOptions !== null ? this.props.appearOptions : this.props.enterOptions;
+
+	        this._animate(componentNodes, properties, options,
 	        // remove all transitioned keys after completion
 	        function () {
 	            for (var key in initialChildMapping) {
@@ -288,6 +302,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _leave: function _leave(keysToLeave, done) {
 	        var _this5 = this;
 
+	        var updateChildren = function updateChildren() {
+
+	            // delete keys now the we've finished transitioning
+	            keysToLeave.forEach(function (key) {
+	                delete _this5.currentlyTransitioningKeys[key];
+	            });
+
+	            // delete any keysToLeave since they've transitioned out
+	            // set the new children to current state
+	            _this5.setState(function (state) {
+
+	                var newChildren = _utilities2['default'].assign({}, state.children);
+
+	                keysToLeave.forEach(function (key) {
+	                    delete newChildren[key];
+	                });
+
+	                return { children: newChildren };
+	            }, done);
+	        };
+
 	        var nodesToLeave = [];
 
 	        if (keysToLeave.length <= 0) {
@@ -299,27 +334,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            _this5.currentlyTransitioningKeys[key] = true;
 	        });
 
-	        this._animate(nodesToLeave, this.props.leave, this.props.leaveOptions,
-	        // remove all transitioned keys
-	        function () {
-	            // delete keys now the we've finished transitioning
-	            keysToLeave.forEach(function (key) {
-	                delete _this5.currentlyTransitioningKeys[key];
-	            });
+	        if (this.props.leave === false) {
+	            updateChildren();
+	            return;
+	        }
 
-	            // set the state of our new children and delete any
-	            // keysToLeave stored
-	            _this5.setState(function (state) {
-
-	                var newChildren = _utilities2['default'].assign({}, state.children);
-
-	                keysToLeave.forEach(function (key) {
-	                    delete newChildren[key];
-	                });
-
-	                return { children: newChildren };
-	            }, done);
-	        });
+	        this._animate(nodesToLeave, this.props.leave, this.props.leaveOptions, updateChildren);
 	    },
 
 	    render: function render() {
@@ -416,7 +436,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var TransitionChildMapping = {
 
 	    getChildMapping: function getChildMapping(children) {
-	        var wrapper = arguments[1] === undefined ? false : arguments[1];
 
 	        if (!children) return children;
 
@@ -449,7 +468,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // For each key of `next`, the list of keys to insert before that key in
 	        // the combined list
 	        var nextKeysPending = {};
-
 	        var pendingKeys = [];
 
 	        for (var prevKey in prev) {

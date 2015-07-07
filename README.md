@@ -1,6 +1,6 @@
-##VelocityTransitionGroup 0.2.9
+##VelocityTransitionGroup 0.3.0
 
-**Docs Coming Soon**
+**Getting close to version 1 as well as actual documentation and live samples. Check example for now.***
 
 ###Run Example
     npm install
@@ -10,42 +10,41 @@ open your browser and visit: http://localhost:8080/
 
 ###Example Usage
     <VelocityTransitionGroup
+        /* pass desired html tag */
         component="ul"
-        
-        /* transition upon entering DOM */
-        enter="transition.fadeIn"
-        
-        /* if not set, no transition out should happen on leave
-        leave="transition.fadeOut"
         
         /* either pass true or another string for a seperate transition on load */
         appear="transition.bounceIn"
         
-        /* pass true to transition height and make room to animate element in 
-        ***only works for single elements as of right now*** */
+        /* transition upon entering DOM, notice we can pass properties as well as forecfeed the values instead of a predefined animation */
+        enter={{opacity: [0, 1]}}
+        
+        /* if not set, no transition out should happen on leave */
+        leave="transition.fadeOut"
+        
+        /* pass true to animate parent height before transitioning children in */
         wrapper={false}
     
-        /* set a default duration for all transitions */
-        duration={300}
+        /* set default options for all transitions */
+        defaults={{
+            duration: 300
+        }}
     
-        /* optionally pass in any options to velocity */
-        /* will override transitionEnter, transitionLeave, etc.. */
-        enterOptions={{
-            delay: 100,
+        /* or optionally pass in different options per transition */
+        appearOptions={{
+            stagger: 100,
             etc...
         }}
+        enterOptions=""
         leaveOptions=""
-        appearOptions=""
     >
         {items}
     </VelocityTransitionGroup>
 
 ###Known Bugs
-If changing state before completing any animation it will lose any references between both and return nothing. Need to handle canceling a transition if this happens and return the requested state.
+Switching between two states callbacks are off and show all elements at one time, need to handle firing at proper times.
 
-Get total height method called multiple times. Fixing this should fix wrapper element problem.
+If changing state before completing any animation it will lose any references between both and return nothing or get stuck. Need to handle canceling a transition if this happens and return the requested state.
 
 ###TODOS
-Use wrapper on more than one element. Gathers incorrect height for more than one element right now.
-
 Check if jQuery is loaded or not since Velocity changes behaivor if it is

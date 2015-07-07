@@ -4,7 +4,7 @@ import React from 'react';
 
 var TransitionChildMapping = {
 
-    getChildMapping: function(children, wrapper = false) {
+    getChildMapping: function(children) {
 
         if(!children) return children;
 
@@ -35,7 +35,6 @@ var TransitionChildMapping = {
         // For each key of `next`, the list of keys to insert before that key in
         // the combined list
         let nextKeysPending = {};
-
         let pendingKeys = [];
         
         for(let prevKey in prev) {

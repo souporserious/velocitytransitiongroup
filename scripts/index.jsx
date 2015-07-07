@@ -24,7 +24,7 @@ class InsertDemo extends React.Component {
                     enter="transition.fadeIn"
                     enterOptions={{delay: 100}}
                     leave="transition.fadeOut"
-                    duration={450}
+                    defaults={{duration: 450}}
                     wrapper={true}
                 >
                     {this.state.clicked && <div key="inner" className="box__inner"></div>}
@@ -38,29 +38,31 @@ class ModalDemo extends React.Component {
 
     constructor(props) {
         super(props);
+        this.state = {wells: []};
+    }
+
+    handleWells(wells) {
+        this.setState({wells: wells});
     }
 
     render() {
 
-        let wells = this.props.wells.map(well => {
+        let wells = this.state.wells.map(well => {
             return <div key={well} className="modal__well">{well}</div>;
         });
 
         return(
-            <main className="modal">
+            <div className="modal">
+                <button onClick={this.handleWells.bind(this, ['main', 'profile', 'contact'])}>1st Set</button>
+                <button onClick={this.handleWells.bind(this, ['help', 'contact'])}>2nd Set</button>
+                <button onClick={this.handleWells.bind(this, ['main', 'about', 'blog', 'help'])}>3rd Set</button>
                 <VelocityTransitionGroup
                     component="div"
                     className="modal__body"
                     appear="transition.fadeIn"
-                    appearOptions={{
-                        stagger: 350
-                    }}
                     enter="transition.fadeIn"
-                    enterOptions={{
-                        stagger: 350
-                    }}
                     leave="transition.fadeOut"
-                    leaveOptions={{
+                    defaults={{
                         stagger: 350
                     }}
                     duration={350}
@@ -68,7 +70,7 @@ class ModalDemo extends React.Component {
                 >
                     {wells}
                 </VelocityTransitionGroup>
-            </main>
+            </div>
         );
     }
 }
@@ -113,9 +115,11 @@ class ToDo extends React.Component {
                 </div>
                 <VelocityTransitionGroup
                     component="ul"
-                    appearOptions={{
+                    enterOptions={{
+                        duration: 3000,
                         stagger: 35
                     }}
+                    leave={false}
                 >
                     {items}
                 </VelocityTransitionGroup>
@@ -125,25 +129,11 @@ class ToDo extends React.Component {
 }
 
 class App extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {wells: []};
-    }
-
-    handleWells(wells) {
-        this.setState({wells: wells});
-    }
-
     render() {
         return(
             <div className="app">
                 <InsertDemo />
-
-                <button onClick={this.handleWells.bind(this, ['main', 'profile', 'contact'])}>1st Set</button>
-                <button onClick={this.handleWells.bind(this, ['help', 'contact'])}>2nd Set</button>
-                <button onClick={this.handleWells.bind(this, ['main', 'about', 'blog', 'help'])}>3rd Set</button>
-                <ModalDemo wells={this.state.wells} />
-
+                <ModalDemo />
                 <ToDo />
             </div>
         );
