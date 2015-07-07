@@ -1,4 +1,4 @@
-##VelocityTransitionGroup 0.3.0
+##VelocityTransitionGroup 0.3.1
 
 **Getting close to version 1 as well as actual documentation and live samples. Check example for now.***
 
@@ -35,8 +35,9 @@ open your browser and visit: http://localhost:8080/
             stagger: 100,
             etc...
         }}
-        enterOptions=""
-        leaveOptions=""
+        enterOptions={{}}
+        leaveOptions={{}}
+        wrapperOptions={{}}
     >
         {items}
     </VelocityTransitionGroup>
@@ -47,4 +48,6 @@ Switching between two states callbacks are off and show all elements at one time
 If changing state before completing any animation it will lose any references between both and return nothing or get stuck. Need to handle canceling a transition if this happens and return the requested state.
 
 ###TODOS
+Add support for sorting arrays
+
 Check if jQuery is loaded or not since Velocity changes behaivor if it is

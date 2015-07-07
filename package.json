@@ -1,6 +1,6 @@
 {
   "name": "velocitytransitiongroup",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "React addon component to easily use Velocity animations in React.",
   "main": "dist/VelocityTransitionGroup.js",
   "scripts": {

@@ -95,7 +95,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            leave: { opacity: 0 },
 	            leaveOptions: {},
 	            defaults: {},
-	            wrapper: false
+	            wrapper: false,
+	            wrapperOptions: { display: 'block' }
 	        };
 	    },
 
@@ -112,12 +113,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.prevChildMapping = null;
 	        this.nextChildMapping = null;
 	        this.totalHeight = 0;
-	        this.defaults = _utilities2['default'].assign({
+	        this.lastTotalHeight = 0;
+	        this.defaults = _utilities2['default'].extend({
 	            display: 'auto'
 	        }, this.props.defaults);
 	    },
 
 	    componentDidMount: function componentDidMount() {
+	        this.totalHeight = this._getTotalHeight(this.state.children);
 	        this._appear();
 	    },
 
@@ -163,6 +166,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.keysToLeave = [];
 
 	        // if same keys bail out
+	        // could use old keys to check if same animation passed through twice
 	        if (keysToEnter.length <= 0 && keysToLeave.length <= 0) {
 	            return;
 	        }
@@ -171,16 +175,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // reset height before gathering it
 	            this.totalHeight = 0;
 	            this.totalHeight = this._getTotalHeight(this.nextChildMapping);
-
-	            // hide elements so they don't appear when transitioning wrapper
-	            this._hideElements(keysToEnter);
 	        }
+
+	        // hide elements so they don't appear until we need them to
+	        this._hideElements(keysToEnter);
 
 	        // just enter if keys to leave are empty
 	        if (keysToLeave.length <= 0) {
+	            this._animateWrapper();
 	            this._enter(keysToEnter);
 	        } else {
 	            this._leave(keysToLeave, function () {
+	                _this._animateWrapper();
 	                _this._enter(keysToEnter);
 	            });
 	        }
@@ -234,20 +240,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	        } : done;
 
 	        // finally, merge defaults and callback into final options
-	        options = _utilities2['default'].assign(this.defaults, {
+	        options = _utilities2['default'].extend(this.defaults, {
 	            complete: complete
 	        }, options);
 
-	        if (this.props.wrapper) {
-	            (0, _velocityAnimate2['default'])(_react2['default'].findDOMNode(this), {
-	                height: this.totalHeight
-	            }, {
-	                display: 'block',
-	                duration: options.duration
-	            });
-	        }
-
 	        (0, _velocityAnimate2['default'])(elements, properties, options);
+	    },
+
+	    _animateWrapper: function _animateWrapper() {
+
+	        if (!this.props.wrapper) return;
+
+	        this._animate(_react2['default'].findDOMNode(this), {
+	            height: [this.totalHeight, this.lastTotalHeight]
+	        }, this.props.wrapperOptions, null);
+	        this.lastTotalHeight = this.totalHeight;
 	    },
 
 	    _appear: function _appear() {
@@ -268,6 +275,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        var properties = this.props.appear !== null ? this.props.appear : this.props.enter,
 	            options = this.props.appearOptions !== null ? this.props.appearOptions : this.props.enterOptions;
+
+	        this._animateWrapper();
 
 	        this._animate(componentNodes, properties, options,
 	        // remove all transitioned keys after completion
@@ -405,6 +414,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        return to;
+	    },
+	    extend: function extend() {
+	        for (var _len = arguments.length, objs = Array(_len), _key = 0; _key < _len; _key++) {
+	            objs[_key] = arguments[_key];
+	        }
+
+	        var out = {},
+	            objsLength = objs.length;
+
+	        for (var i = 0; i < objsLength; i++) {
+	            if (!objs[i]) continue;
+
+	            for (var key in objs[i]) {
+	                if (objs[i].hasOwnProperty(key)) {
+	                    out[key] = objs[i][key];
+	                }
+	            }
+	        }
+
+	        return out;
 	    }
 	};
 	module.exports = exports['default'];

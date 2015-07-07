@@ -22,10 +22,14 @@ class InsertDemo extends React.Component {
                 <div className="box__header"></div>
                 <VelocityTransitionGroup
                     enter="transition.fadeIn"
-                    enterOptions={{delay: 100}}
+                    enterOptions={{delay: 250}}
                     leave="transition.fadeOut"
-                    defaults={{duration: 450}}
+                    defaults={{duration: 250}}
                     wrapper={true}
+                    wrapperOptions={{
+                        display: 'block',
+                        duration: 100
+                    }}
                 >
                     {this.state.clicked && <div key="inner" className="box__inner"></div>}
                 </VelocityTransitionGroup>
@@ -38,7 +42,7 @@ class ModalDemo extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {wells: []};
+        this.state = {wells: ['main', 'profile', 'contact']};
     }
 
     handleWells(wells) {

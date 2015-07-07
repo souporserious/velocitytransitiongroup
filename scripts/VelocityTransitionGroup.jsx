@@ -21,7 +21,8 @@ let VelocityTransitionGroup = React.createClass({
             leave: {opacity: 0},
             leaveOptions: {},
             defaults: {},
-            wrapper: false
+            wrapper: false,
+            wrapperOptions: {display: 'block'}
         }
     },
 
@@ -39,12 +40,13 @@ let VelocityTransitionGroup = React.createClass({
         this.nextChildMapping = null;
         this.totalHeight = 0;
         this.lastTotalHeight = 0;
-        this.defaults = _.assign({
+        this.defaults = _.extend({
             display: 'auto'
         }, this.props.defaults);
     },
 
     componentDidMount: function () {
+        this.totalHeight = this._getTotalHeight(this.state.children);
         this._appear();
     },
 
@@ -94,6 +96,7 @@ let VelocityTransitionGroup = React.createClass({
         this.keysToLeave = [];
 
         // if same keys bail out
+        // could use old keys to check if same animation passed through twice
         if(keysToEnter.length <= 0 && keysToLeave.length <= 0) {
             return;
         }
@@ -109,9 +112,11 @@ let VelocityTransitionGroup = React.createClass({
 
         // just enter if keys to leave are empty
         if(keysToLeave.length <= 0) {
+            this._animateWrapper();
             this._enter(keysToEnter);
         } else {
             this._leave(keysToLeave, () => {
+                this._animateWrapper();
                 this._enter(keysToEnter);
             });
         }
@@ -161,24 +166,26 @@ let VelocityTransitionGroup = React.createClass({
         } : done;
 
         // finally, merge defaults and callback into final options
-        options = _.assign(this.defaults, {
+        options = _.extend(this.defaults, {
             complete: complete
         }, options);
 
-        if(this.props.wrapper) {
-            Velocity(
-                React.findDOMNode(this),
-                {
-                    height: [this.totalHeight, this.lastTotalHeight]
-                }, {
-                    display: 'block',
-                    duration: options.duration
-                }
-            );
-            this.lastTotalHeight = this.totalHeight;
-        }
-
         Velocity(elements, properties, options);
+    },
+
+    _animateWrapper: function () {
+
+        if(!this.props.wrapper) return;
+
+        this._animate(
+            React.findDOMNode(this),
+            {
+                height: [this.totalHeight, this.lastTotalHeight]
+            },
+            this.props.wrapperOptions,
+            null
+        );
+        this.lastTotalHeight = this.totalHeight;
     },
 
     _appear: function () {
@@ -198,6 +205,8 @@ let VelocityTransitionGroup = React.createClass({
 
         let properties = this.props.appear !== null ? this.props.appear : this.props.enter,
             options = this.props.appearOptions !== null ? this.props.appearOptions : this.props.enterOptions;
+
+        this._animateWrapper();
 
         this._animate(
             componentNodes,
