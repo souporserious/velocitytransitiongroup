@@ -101,10 +101,10 @@ let VelocityTransitionGroup = React.createClass({
             // reset height before gathering it
             this.totalHeight = 0;
             this.totalHeight = this._getTotalHeight(this.nextChildMapping);
-
-            // hide elements so they don't appear when transitioning wrapper
-            this._hideElements(keysToEnter);
         }
+
+        // hide elements so they don't appear until we need them to
+        this._hideElements(keysToEnter);
 
         // just enter if keys to leave are empty
         if(keysToLeave.length <= 0) {
@@ -149,7 +149,7 @@ let VelocityTransitionGroup = React.createClass({
         });
     },
 
-    _animate: function (elements, properties, options, done) {
+    _animate: function (elements, properties, options, done, animateParent) {
 
         if(elements.length <= 0) return;
 
@@ -164,7 +164,7 @@ let VelocityTransitionGroup = React.createClass({
             complete: complete
         }, options);
 
-        if(this.props.wrapper) {
+        if(this.props.wrapper && animateParent) {
             Velocity(
                 React.findDOMNode(this),
                 {
@@ -208,7 +208,8 @@ let VelocityTransitionGroup = React.createClass({
                         delete this.currentlyTransitioningKeys[key];
                     }
                 }
-            }
+            },
+            true
         );
     },
 
@@ -230,7 +231,8 @@ let VelocityTransitionGroup = React.createClass({
                 keysToEnter.forEach(key => {
                     delete this.currentlyTransitioningKeys[key];
                 });
-            }
+            },
+            true
         );
     },
 

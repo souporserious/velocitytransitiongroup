@@ -54,8 +54,8 @@ class ModalDemo extends React.Component {
         return(
             <div className="modal">
                 <button onClick={this.handleWells.bind(this, ['main', 'profile', 'contact'])}>1st Set</button>
-                <button onClick={this.handleWells.bind(this, ['help', 'contact'])}>2nd Set</button>
-                <button onClick={this.handleWells.bind(this, ['main', 'about', 'blog', 'help'])}>3rd Set</button>
+                <button onClick={this.handleWells.bind(this, ['help', 'about', 'blog'])}>2nd Set</button>
+                <button onClick={this.handleWells.bind(this, ['apples', 'mangos', 'oranges', 'bananas'])}>3rd Set</button>
                 <VelocityTransitionGroup
                     component="div"
                     className="modal__body"
@@ -63,9 +63,9 @@ class ModalDemo extends React.Component {
                     enter="transition.fadeIn"
                     leave="transition.fadeOut"
                     defaults={{
-                        stagger: 350
+                        stagger: 150
                     }}
-                    duration={350}
+                    duration={150}
                     wrapper={true}
                 >
                     {wells}
@@ -119,7 +119,6 @@ class ToDo extends React.Component {
                         duration: 3000,
                         stagger: 35
                     }}
-                    leave={false}
                 >
                     {items}
                 </VelocityTransitionGroup>
