@@ -38,6 +38,7 @@ let VelocityTransitionGroup = React.createClass({
         this.prevChildMapping = null;
         this.nextChildMapping = null;
         this.totalHeight = 0;
+        this.lastTotalHeight = 0;
         this.defaults = _.assign({
             display: 'auto'
         }, this.props.defaults);
@@ -149,7 +150,7 @@ let VelocityTransitionGroup = React.createClass({
         });
     },
 
-    _animate: function (elements, properties, options, done, animateParent) {
+    _animate: function (elements, properties, options, done) {
 
         if(elements.length <= 0) return;
 
@@ -164,16 +165,17 @@ let VelocityTransitionGroup = React.createClass({
             complete: complete
         }, options);
 
-        if(this.props.wrapper && animateParent) {
+        if(this.props.wrapper) {
             Velocity(
                 React.findDOMNode(this),
                 {
-                    height: this.totalHeight
+                    height: [this.totalHeight, this.lastTotalHeight]
                 }, {
                     display: 'block',
                     duration: options.duration
                 }
             );
+            this.lastTotalHeight = this.totalHeight;
         }
 
         Velocity(elements, properties, options);
@@ -208,8 +210,7 @@ let VelocityTransitionGroup = React.createClass({
                         delete this.currentlyTransitioningKeys[key];
                     }
                 }
-            },
-            true
+            }
         );
     },
 
@@ -231,8 +232,7 @@ let VelocityTransitionGroup = React.createClass({
                 keysToEnter.forEach(key => {
                     delete this.currentlyTransitioningKeys[key];
                 });
-            },
-            true
+            }
         );
     },
 
