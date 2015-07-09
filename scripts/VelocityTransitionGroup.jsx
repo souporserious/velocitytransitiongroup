@@ -1,56 +1,58 @@
 'use strict';
 
 import _ from './utilities';
-import React from 'react';
+import React, { Component, PropTypes } from 'react';
 import Velocity from 'velocity-animate';
 import TransitionChildMapping from './TransitionChildMapping';
 
-let VelocityTransitionGroup = React.createClass({
+class VelocityTransitionGroup extends Component {
     
-    propTypes: {
+    static propTypes = {
         component: React.PropTypes.any
-    },
+    }
 
-    getDefaultProps: function () {
-        return {
-            component: 'span',
-            appear: null,
-            appearOptions: null,
-            enter: {opacity: [1, 0]},
-            enterOptions: {},
-            leave: {opacity: 0},
-            leaveOptions: {},
-            defaults: {},
-            wrapper: false,
-            wrapperOptions: {display: 'block'}
-        }
-    },
+    static defaultProps = {
+        component: 'span',
+        appear: null,
+        appearOptions: null,
+        enter: {opacity: [1, 0]},
+        enterOptions: {},
+        leave: {opacity: 0},
+        leaveOptions: {},
+        defaults: {},
+        wrapper: false,
+        wrapperOptions: {display: 'block'}
+    }
 
-    getInitialState: function () {
-        return {
-            children: this._getCurrentChildMapping()
-        }
-    },
+    currentlyTransitioningKeys = {};
 
-    componentWillMount: function () {
-        this.currentlyTransitioningKeys = {};
-        this.keysToEnter = [];
-        this.keysToLeave = [];
-        this.prevChildMapping = null;
-        this.nextChildMapping = null;
-        this.totalHeight = 0;
-        this.lastTotalHeight = 0;
-        this.defaults = _.extend({
-            display: 'auto'
-        }, this.props.defaults);
-    },
+    keysToEnter = [];
 
-    componentDidMount: function () {
+    keysToLeave = [];
+
+    prevChildMapping = null;
+
+    nextChildMapping = null;
+
+    totalHeight = 0;
+
+    lastTotalHeight = 0;
+    
+    defaults = _.extend({
+        display: 'auto'
+    }, this.props.defaults);
+
+    constructor(props) {
+        super(props);
+        this.state = {children: this._getCurrentChildMapping()};
+    }
+
+    componentDidMount() {
         this.totalHeight = this._getTotalHeight(this.state.children);
         this._appear();
-    },
+    }
 
-    componentWillReceiveProps: function (nextProps) {
+    componentWillReceiveProps(nextProps) {
 
         this.prevChildMapping = this.state.children;
         this.nextChildMapping = this._getCurrentChildMapping(nextProps.children);
@@ -85,9 +87,9 @@ let VelocityTransitionGroup = React.createClass({
                 this.keysToLeave.push(key);
             }
         }
-    },
+    }
 
-    componentDidUpdate: function () {
+    componentDidUpdate() {
 
         let keysToEnter = this.keysToEnter;
         this.keysToEnter = [];
@@ -120,9 +122,9 @@ let VelocityTransitionGroup = React.createClass({
                 this._enter(keysToEnter);
             });
         }
-    },
+    }
 
-    _getTotalHeight: function (childMapping) {
+    _getTotalHeight(childMapping) {
 
         function outerHeight(el) {
 
@@ -142,20 +144,20 @@ let VelocityTransitionGroup = React.createClass({
         }
 
         return totalHeight;
-    },
+    }
 
-    _getCurrentChildMapping: function (children = this.props.children) {
+    _getCurrentChildMapping(children = this.props.children) {
         return TransitionChildMapping.getChildMapping(children);
-    },
+    }
 
-    _hideElements: function (keys) {
+    _hideElements(keys) {
         keys.forEach(key => {
             let node = React.findDOMNode(this.refs[key]);
             node.style.display = 'none';
         });
-    },
+    }
 
-    _animate: function (elements, properties, options, done) {
+    _animate(elements, properties, options, done) {
 
         if(elements.length <= 0) return;
 
@@ -171,9 +173,9 @@ let VelocityTransitionGroup = React.createClass({
         }, options);
 
         Velocity(elements, properties, options);
-    },
+    }
 
-    _animateWrapper: function () {
+    _animateWrapper() {
 
         if(!this.props.wrapper) return;
 
@@ -186,9 +188,9 @@ let VelocityTransitionGroup = React.createClass({
             null
         );
         this.lastTotalHeight = this.totalHeight;
-    },
+    }
 
-    _appear: function () {
+    _appear() {
 
         let initialChildMapping = this.state.children;
         let componentNodes = [];
@@ -221,9 +223,9 @@ let VelocityTransitionGroup = React.createClass({
                 }
             }
         );
-    },
+    }
 
-    _enter: function (keysToEnter) {
+    _enter(keysToEnter) {
 
         let nodesToEnter = [];
 
@@ -243,9 +245,9 @@ let VelocityTransitionGroup = React.createClass({
                 });
             }
         );
-    },
+    }
 
-    _leave: function (keysToLeave, done) {
+    _leave(keysToLeave, done) {
 
         let updateChildren = () => {
 
@@ -290,9 +292,9 @@ let VelocityTransitionGroup = React.createClass({
             this.props.leaveOptions,
             updateChildren
         );
-    },
+    }
 
-    render: function () {
+    render() {
         
         let childrenToRender = [];
 
@@ -316,6 +318,6 @@ let VelocityTransitionGroup = React.createClass({
             childrenToRender
         );
     }
-});
+}
 
 export default VelocityTransitionGroup;

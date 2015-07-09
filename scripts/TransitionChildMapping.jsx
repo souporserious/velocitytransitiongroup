@@ -1,10 +1,8 @@
 'use strict';
 
-import React from 'react';
-
 var TransitionChildMapping = {
 
-    getChildMapping: function(children) {
+    getChildMapping(children) {
 
         if(!children) return children;
 
@@ -22,7 +20,7 @@ var TransitionChildMapping = {
         return mappedChildren;
     },
 
-    mergeChildMappings: function(prev = {}, next = {}) {
+    mergeChildMappings(prev = {}, next = {}) {
 
         function getValueForKey(key) {
             if(next.hasOwnProperty(key)) {
@@ -72,7 +70,7 @@ var TransitionChildMapping = {
         }
 
         return childMapping;
-    },
+    }
 };
 
 module.exports = TransitionChildMapping;

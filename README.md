@@ -1,6 +1,6 @@
 ##VelocityTransitionGroup 0.3.1
 
-**Getting close to version 1 as well as actual documentation and live samples. Check example for now.***
+**Getting close to version 1 as well as actual documentation and live samples. Check example for now.**
 
 ###Run Example
     npm install
