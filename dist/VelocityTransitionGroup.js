@@ -60,7 +60,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x2, _x3, _x4) { var _again = true; _function: while (_again) { var object = _x2, property = _x3, receiver = _x4; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x2 = parent; _x3 = property; _x4 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
 	var _utilities = __webpack_require__(1);
 
@@ -78,35 +86,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _TransitionChildMapping2 = _interopRequireDefault(_TransitionChildMapping);
 
-	var VelocityTransitionGroup = _react2['default'].createClass({
-	    displayName: 'VelocityTransitionGroup',
+	var VelocityTransitionGroup = (function (_Component) {
+	    function VelocityTransitionGroup(props) {
+	        _classCallCheck(this, VelocityTransitionGroup);
 
-	    propTypes: {
-	        component: _react2['default'].PropTypes.any
-	    },
-
-	    getDefaultProps: function getDefaultProps() {
-	        return {
-	            component: 'span',
-	            appear: null,
-	            appearOptions: null,
-	            enter: { opacity: [1, 0] },
-	            enterOptions: {},
-	            leave: { opacity: 0 },
-	            leaveOptions: {},
-	            defaults: {},
-	            wrapper: false,
-	            wrapperOptions: { display: 'block' }
-	        };
-	    },
-
-	    getInitialState: function getInitialState() {
-	        return {
-	            children: this._getCurrentChildMapping()
-	        };
-	    },
-
-	    componentWillMount: function componentWillMount() {
+	        _get(Object.getPrototypeOf(VelocityTransitionGroup.prototype), 'constructor', this).call(this, props);
 	        this.currentlyTransitioningKeys = {};
 	        this.keysToEnter = [];
 	        this.keysToLeave = [];
@@ -117,258 +101,298 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.defaults = _utilities2['default'].extend({
 	            display: 'auto'
 	        }, this.props.defaults);
-	    },
+	        this.state = { children: this._getCurrentChildMapping() };
+	    }
 
-	    componentDidMount: function componentDidMount() {
-	        this.totalHeight = this._getTotalHeight(this.state.children);
-	        this._appear();
-	    },
+	    _inherits(VelocityTransitionGroup, _Component);
 
-	    componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
-
-	        this.prevChildMapping = this.state.children;
-	        this.nextChildMapping = this._getCurrentChildMapping(nextProps.children);
-
-	        var prevChildMapping = this.prevChildMapping;
-	        var nextChildMapping = this.nextChildMapping;
-
-	        // set current and next children to current state
-	        this.setState({
-	            children: _TransitionChildMapping2['default'].mergeChildMappings(prevChildMapping, nextChildMapping)
-	        });
-
-	        for (var key in nextChildMapping) {
-
-	            var hasPrev = prevChildMapping && prevChildMapping.hasOwnProperty(key);
-
-	            if (nextChildMapping[key] && !hasPrev && !this.currentlyTransitioningKeys[key]) {
-	                this.keysToEnter.push(key);
-	            }
+	    _createClass(VelocityTransitionGroup, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            this.totalHeight = this._getTotalHeight(this.state.children);
+	            this._appear();
 	        }
+	    }, {
+	        key: 'componentWillReceiveProps',
+	        value: function componentWillReceiveProps(nextProps) {
 
-	        for (var key in prevChildMapping) {
+	            this.prevChildMapping = this.state.children;
+	            this.nextChildMapping = this._getCurrentChildMapping(nextProps.children);
 
-	            var hasNext = nextChildMapping && nextChildMapping.hasOwnProperty(key);
+	            var prevChildMapping = this.prevChildMapping;
+	            var nextChildMapping = this.nextChildMapping;
 
-	            if (prevChildMapping[key] && !hasNext && !this.currentlyTransitioningKeys[key]) {
-	                this.keysToLeave.push(key);
-	            }
-	        }
-	    },
-
-	    componentDidUpdate: function componentDidUpdate() {
-	        var _this = this;
-
-	        var keysToEnter = this.keysToEnter;
-	        this.keysToEnter = [];
-
-	        var keysToLeave = this.keysToLeave;
-	        this.keysToLeave = [];
-
-	        // if same keys bail out
-	        // could use old keys to check if same animation passed through twice
-	        if (keysToEnter.length <= 0 && keysToLeave.length <= 0) {
-	            return;
-	        }
-
-	        if (this.props.wrapper) {
-	            // reset height before gathering it
-	            this.totalHeight = 0;
-	            this.totalHeight = this._getTotalHeight(this.nextChildMapping);
-	        }
-
-	        // hide elements so they don't appear until we need them to
-	        this._hideElements(keysToEnter);
-
-	        // just enter if keys to leave are empty
-	        if (keysToLeave.length <= 0) {
-	            this._animateWrapper();
-	            this._enter(keysToEnter);
-	        } else {
-	            this._leave(keysToLeave, function () {
-	                _this._animateWrapper();
-	                _this._enter(keysToEnter);
+	            // set current and next children to current state
+	            this.setState({
+	                children: _TransitionChildMapping2['default'].mergeChildMappings(prevChildMapping, nextChildMapping)
 	            });
-	        }
-	    },
 
-	    _getTotalHeight: function _getTotalHeight(childMapping) {
+	            for (var key in nextChildMapping) {
 
-	        function outerHeight(el) {
+	                var hasPrev = prevChildMapping && prevChildMapping.hasOwnProperty(key);
 
-	            var height = el.offsetHeight,
-	                style = getComputedStyle(el);
-
-	            height += parseInt(style.marginTop) + parseInt(style.marginBottom);
-
-	            return height;
-	        }
-
-	        var totalHeight = 0;
-
-	        for (var key in childMapping) {
-	            var node = _react2['default'].findDOMNode(this.refs[key]);
-	            totalHeight += outerHeight(node);
-	        }
-
-	        return totalHeight;
-	    },
-
-	    _getCurrentChildMapping: function _getCurrentChildMapping() {
-	        var children = arguments[0] === undefined ? this.props.children : arguments[0];
-
-	        return _TransitionChildMapping2['default'].getChildMapping(children);
-	    },
-
-	    _hideElements: function _hideElements(keys) {
-	        var _this2 = this;
-
-	        keys.forEach(function (key) {
-	            var node = _react2['default'].findDOMNode(_this2.refs[key]);
-	            node.style.display = 'none';
-	        });
-	    },
-
-	    _animate: function _animate(elements, properties, options, done) {
-
-	        if (elements.length <= 0) return;
-
-	        // allow user to still be able to pass a complete callback
-	        var complete = options.complete ? function () {
-	            options.complete();
-	            done();
-	        } : done;
-
-	        // finally, merge defaults and callback into final options
-	        options = _utilities2['default'].extend(this.defaults, {
-	            complete: complete
-	        }, options);
-
-	        (0, _velocityAnimate2['default'])(elements, properties, options);
-	    },
-
-	    _animateWrapper: function _animateWrapper() {
-
-	        if (!this.props.wrapper) return;
-
-	        this._animate(_react2['default'].findDOMNode(this), {
-	            height: [this.totalHeight, this.lastTotalHeight]
-	        }, this.props.wrapperOptions, null);
-	        this.lastTotalHeight = this.totalHeight;
-	    },
-
-	    _appear: function _appear() {
-	        var _this3 = this;
-
-	        var initialChildMapping = this.state.children;
-	        var componentNodes = [];
-
-	        if (!initialChildMapping) return;
-
-	        // loop through children and store nodes
-	        for (var key in initialChildMapping) {
-	            if (initialChildMapping[key]) {
-	                componentNodes.push(_react2['default'].findDOMNode(this.refs[key]));
-	                this.currentlyTransitioningKeys[key] = true;
-	            }
-	        }
-
-	        var properties = this.props.appear !== null ? this.props.appear : this.props.enter,
-	            options = this.props.appearOptions !== null ? this.props.appearOptions : this.props.enterOptions;
-
-	        this._animateWrapper();
-
-	        this._animate(componentNodes, properties, options,
-	        // remove all transitioned keys after completion
-	        function () {
-	            for (var key in initialChildMapping) {
-	                if (initialChildMapping[key]) {
-	                    delete _this3.currentlyTransitioningKeys[key];
+	                if (nextChildMapping[key] && !hasPrev && !this.currentlyTransitioningKeys[key]) {
+	                    this.keysToEnter.push(key);
 	                }
 	            }
-	        });
-	    },
 
-	    _enter: function _enter(keysToEnter) {
-	        var _this4 = this;
+	            for (var key in prevChildMapping) {
 
-	        var nodesToEnter = [];
+	                var hasNext = nextChildMapping && nextChildMapping.hasOwnProperty(key);
 
-	        keysToEnter.forEach(function (key) {
-	            nodesToEnter.push(_react2['default'].findDOMNode(_this4.refs[key]));
-	            _this4.currentlyTransitioningKeys[key] = true;
-	        });
-
-	        this._animate(nodesToEnter, this.props.enter, this.props.enterOptions,
-	        // remove all transitioned keys
-	        function () {
-	            keysToEnter.forEach(function (key) {
-	                delete _this4.currentlyTransitioningKeys[key];
-	            });
-	        });
-	    },
-
-	    _leave: function _leave(keysToLeave, done) {
-	        var _this5 = this;
-
-	        var updateChildren = function updateChildren() {
-
-	            // delete keys now the we've finished transitioning
-	            keysToLeave.forEach(function (key) {
-	                delete _this5.currentlyTransitioningKeys[key];
-	            });
-
-	            // delete any keysToLeave since they've transitioned out
-	            // set the new children to current state
-	            _this5.setState(function (state) {
-
-	                var newChildren = _utilities2['default'].assign({}, state.children);
-
-	                keysToLeave.forEach(function (key) {
-	                    delete newChildren[key];
-	                });
-
-	                return { children: newChildren };
-	            }, done);
-	        };
-
-	        var nodesToLeave = [];
-
-	        if (keysToLeave.length <= 0) {
-	            done();
-	        }
-
-	        keysToLeave.forEach(function (key) {
-	            nodesToLeave.push(_react2['default'].findDOMNode(_this5.refs[key]));
-	            _this5.currentlyTransitioningKeys[key] = true;
-	        });
-
-	        if (this.props.leave === false) {
-	            updateChildren();
-	            return;
-	        }
-
-	        this._animate(nodesToLeave, this.props.leave, this.props.leaveOptions, updateChildren);
-	    },
-
-	    render: function render() {
-
-	        var childrenToRender = [];
-
-	        for (var key in this.state.children) {
-
-	            var child = this.state.children[key];
-
-	            if (child) {
-	                var newChild = _react2['default'].cloneElement(child, { ref: key, key: key });
-
-	                childrenToRender.push(newChild);
+	                if (prevChildMapping[key] && !hasNext && !this.currentlyTransitioningKeys[key]) {
+	                    this.keysToLeave.push(key);
+	                }
 	            }
 	        }
+	    }, {
+	        key: 'componentDidUpdate',
+	        value: function componentDidUpdate() {
+	            var _this = this;
 
-	        return _react2['default'].createElement(this.props.component, this.props, childrenToRender);
-	    }
-	});
+	            var keysToEnter = this.keysToEnter;
+	            this.keysToEnter = [];
+
+	            var keysToLeave = this.keysToLeave;
+	            this.keysToLeave = [];
+
+	            // if same keys bail out
+	            // could use old keys to check if same animation passed through twice
+	            if (keysToEnter.length <= 0 && keysToLeave.length <= 0) {
+	                return;
+	            }
+
+	            if (this.props.wrapper) {
+	                // reset height before gathering it
+	                this.totalHeight = 0;
+	                this.totalHeight = this._getTotalHeight(this.nextChildMapping);
+	            }
+
+	            // hide elements so they don't appear until we need them to
+	            this._hideElements(keysToEnter);
+
+	            // just enter if keys to leave are empty
+	            if (keysToLeave.length <= 0) {
+	                this._animateWrapper();
+	                this._enter(keysToEnter);
+	            } else {
+	                this._leave(keysToLeave, function () {
+	                    _this._animateWrapper();
+	                    _this._enter(keysToEnter);
+	                });
+	            }
+	        }
+	    }, {
+	        key: '_getTotalHeight',
+	        value: function _getTotalHeight(childMapping) {
+
+	            function outerHeight(el) {
+
+	                var height = el.offsetHeight,
+	                    style = getComputedStyle(el);
+
+	                height += parseInt(style.marginTop) + parseInt(style.marginBottom);
+
+	                return height;
+	            }
+
+	            var totalHeight = 0;
+
+	            for (var key in childMapping) {
+	                var node = _react2['default'].findDOMNode(this.refs[key]);
+	                totalHeight += outerHeight(node);
+	            }
+
+	            return totalHeight;
+	        }
+	    }, {
+	        key: '_getCurrentChildMapping',
+	        value: function _getCurrentChildMapping() {
+	            var children = arguments[0] === undefined ? this.props.children : arguments[0];
+
+	            return _TransitionChildMapping2['default'].getChildMapping(children);
+	        }
+	    }, {
+	        key: '_hideElements',
+	        value: function _hideElements(keys) {
+	            var _this2 = this;
+
+	            keys.forEach(function (key) {
+	                var node = _react2['default'].findDOMNode(_this2.refs[key]);
+	                node.style.display = 'none';
+	            });
+	        }
+	    }, {
+	        key: '_animate',
+	        value: function _animate(elements, properties, options, done) {
+
+	            if (elements.length <= 0) return;
+
+	            // allow user to still be able to pass a complete callback
+	            var complete = options.complete ? function () {
+	                options.complete();
+	                done();
+	            } : done;
+
+	            // finally, merge defaults and callback into final options
+	            options = _utilities2['default'].extend(this.defaults, {
+	                complete: complete
+	            }, options);
+
+	            (0, _velocityAnimate2['default'])(elements, properties, options);
+	        }
+	    }, {
+	        key: '_animateWrapper',
+	        value: function _animateWrapper() {
+
+	            if (!this.props.wrapper) return;
+
+	            this._animate(_react2['default'].findDOMNode(this), {
+	                height: [this.totalHeight, this.lastTotalHeight]
+	            }, this.props.wrapperOptions, null);
+	            this.lastTotalHeight = this.totalHeight;
+	        }
+	    }, {
+	        key: '_appear',
+	        value: function _appear() {
+	            var _this3 = this;
+
+	            var initialChildMapping = this.state.children;
+	            var componentNodes = [];
+
+	            if (!initialChildMapping) return;
+
+	            // loop through children and store nodes
+	            for (var key in initialChildMapping) {
+	                if (initialChildMapping[key]) {
+	                    componentNodes.push(_react2['default'].findDOMNode(this.refs[key]));
+	                    this.currentlyTransitioningKeys[key] = true;
+	                }
+	            }
+
+	            var properties = this.props.appear !== null ? this.props.appear : this.props.enter,
+	                options = this.props.appearOptions !== null ? this.props.appearOptions : this.props.enterOptions;
+
+	            this._animateWrapper();
+
+	            this._animate(componentNodes, properties, options,
+	            // remove all transitioned keys after completion
+	            function () {
+	                for (var key in initialChildMapping) {
+	                    if (initialChildMapping[key]) {
+	                        delete _this3.currentlyTransitioningKeys[key];
+	                    }
+	                }
+	            });
+	        }
+	    }, {
+	        key: '_enter',
+	        value: function _enter(keysToEnter) {
+	            var _this4 = this;
+
+	            var nodesToEnter = [];
+
+	            keysToEnter.forEach(function (key) {
+	                nodesToEnter.push(_react2['default'].findDOMNode(_this4.refs[key]));
+	                _this4.currentlyTransitioningKeys[key] = true;
+	            });
+
+	            this._animate(nodesToEnter, this.props.enter, this.props.enterOptions,
+	            // remove all transitioned keys
+	            function () {
+	                keysToEnter.forEach(function (key) {
+	                    delete _this4.currentlyTransitioningKeys[key];
+	                });
+	            });
+	        }
+	    }, {
+	        key: '_leave',
+	        value: function _leave(keysToLeave, done) {
+	            var _this5 = this;
+
+	            var updateChildren = function updateChildren() {
+
+	                // delete keys now the we've finished transitioning
+	                keysToLeave.forEach(function (key) {
+	                    delete _this5.currentlyTransitioningKeys[key];
+	                });
+
+	                // delete any keysToLeave since they've transitioned out
+	                // set the new children to current state
+	                _this5.setState(function (state) {
+
+	                    var newChildren = _utilities2['default'].assign({}, state.children);
+
+	                    keysToLeave.forEach(function (key) {
+	                        delete newChildren[key];
+	                    });
+
+	                    return { children: newChildren };
+	                }, done);
+	            };
+
+	            var nodesToLeave = [];
+
+	            if (keysToLeave.length <= 0) {
+	                done();
+	            }
+
+	            keysToLeave.forEach(function (key) {
+	                nodesToLeave.push(_react2['default'].findDOMNode(_this5.refs[key]));
+	                _this5.currentlyTransitioningKeys[key] = true;
+	            });
+
+	            if (this.props.leave === false) {
+	                updateChildren();
+	                return;
+	            }
+
+	            this._animate(nodesToLeave, this.props.leave, this.props.leaveOptions, updateChildren);
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+
+	            var childrenToRender = [];
+
+	            for (var key in this.state.children) {
+
+	                var child = this.state.children[key];
+
+	                if (child) {
+	                    var newChild = _react2['default'].cloneElement(child, { ref: key, key: key });
+
+	                    childrenToRender.push(newChild);
+	                }
+	            }
+
+	            return _react2['default'].createElement(this.props.component, this.props, childrenToRender);
+	        }
+	    }], [{
+	        key: 'propTypes',
+	        value: {
+	            component: _react2['default'].PropTypes.any
+	        },
+	        enumerable: true
+	    }, {
+	        key: 'defaultProps',
+	        value: {
+	            component: 'span',
+	            appear: null,
+	            appearOptions: null,
+	            enter: { opacity: [1, 0] },
+	            enterOptions: {},
+	            leave: { opacity: 0 },
+	            leaveOptions: {},
+	            defaults: {},
+	            wrapper: false,
+	            wrapperOptions: { display: 'block' }
+	        },
+	        enumerable: true
+	    }]);
+
+	    return VelocityTransitionGroup;
+	})(_react.Component);
 
 	exports['default'] = VelocityTransitionGroup;
 	module.exports = exports['default'];
@@ -452,17 +476,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 4 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	'use strict';
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	var _react = __webpack_require__(2);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var TransitionChildMapping = {
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	exports['default'] = {
 
 	    getChildMapping: function getChildMapping(children) {
 
@@ -534,8 +555,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return childMapping;
 	    }
 	};
-
-	module.exports = TransitionChildMapping;
+	module.exports = exports['default'];
 
 /***/ }
 /******/ ])

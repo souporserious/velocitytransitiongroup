@@ -1,6 +1,6 @@
 'use strict';
 
-var TransitionChildMapping = {
+export default {
 
     getChildMapping(children) {
 
@@ -72,5 +72,3 @@ var TransitionChildMapping = {
         return childMapping;
     }
 };
-
-module.exports = TransitionChildMapping;

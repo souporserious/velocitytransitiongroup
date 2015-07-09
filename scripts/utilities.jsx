@@ -1,3 +1,5 @@
+'use strict';
+
 export default {
     // https://github.com/facebook/react/blob/38acadf6f493926383aec0362617b8507ddee0d8/src/shared/stubs/Object.assign.js
     assign(target, sources) {

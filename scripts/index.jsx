@@ -1,12 +1,12 @@
 'use strict';
 
-import React from 'react/addons';
+import React, { Component } from 'react';
 import VelocityTransitionGroup from './VelocityTransitionGroup';
+import 'velocity-animate/velocity.ui';
 import '../example/main.scss';
 
-require('velocity-animate/velocity.ui');
+class InsertDemo extends Component {
 
-class InsertDemo extends React.Component {
     constructor() {
         super();
         this.state = {clicked: false};
@@ -38,7 +38,7 @@ class InsertDemo extends React.Component {
     }
 }
 
-class ModalDemo extends React.Component {
+class ModalDemo extends Component {
 
     constructor(props) {
         super(props);
@@ -79,7 +79,7 @@ class ModalDemo extends React.Component {
     }
 }
 
-class ToDo extends React.Component {
+class ToDo extends Component {
 
     constructor(props) {
         super(props);
@@ -131,7 +131,7 @@ class ToDo extends React.Component {
     }
 }
 
-class App extends React.Component {
+class App extends Component {
     render() {
         return(
             <div className="app">
