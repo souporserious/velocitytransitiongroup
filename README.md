@@ -9,6 +9,7 @@
 open your browser and visit: http://localhost:8080/
 
 ###Example Usage
+```js
     <VelocityTransitionGroup
         /* pass desired html tag */
         component="ul"
@@ -41,6 +42,7 @@ open your browser and visit: http://localhost:8080/
     >
         {items}
     </VelocityTransitionGroup>
+```
 
 ###Known Bugs
 Switching between two states callbacks are off and show all elements at one time, need to handle firing at proper times.
@@ -48,6 +50,8 @@ Switching between two states callbacks are off and show all elements at one time
 If changing state before completing any animation it will lose any references between both and return nothing or get stuck. Need to handle canceling a transition if this happens and return the requested state.
 
 ###TODOS
-Add support for sorting arrays
+Add support to animate parent height or a dummy div that gets placed in or both. Could be useful for a list when animating out in between two other items.
 
-Check if jQuery is loaded or not since Velocity changes behaivor if it is
+Add support for sorting arrays.
+
+Check if jQuery is loaded or not since Velocity changes behaivor if it is.
